@@ -27,6 +27,7 @@ const CATEGORIES = [
   { id: 'intrattenimento', emoji: '🎬', label: 'Svago' },
   { id: 'casa',         emoji: '🔧', label: 'Casa'     },
   { id: 'altro',        emoji: '📦', label: 'Altro'    },
+  { id: 'saldo',        emoji: '🤝', label: 'Pareggio', hidden: true },
 ];
 
 const REACTIONS = {
@@ -328,7 +329,7 @@ function buildCategoryGrid(containerId, onSelect, defaultCat) {
   const container = document.getElementById(containerId);
   if (!container) return;
   container.innerHTML = '';
-  CATEGORIES.forEach(cat => {
+  CATEGORIES.filter(c => !c.hidden).forEach(cat => {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'cat-btn' + (cat.id === defaultCat ? ' active' : '');
@@ -583,6 +584,9 @@ function initFormListeners() {
   // Close "Aggiungi spesa" without saving
   document.getElementById('btn-close-add').addEventListener('click', () => navigateTo('home'));
 
+  // Settle up
+  document.getElementById('btn-settle').addEventListener('click', settleUp);
+
   // Logout
   document.getElementById('btn-logout').addEventListener('click', lockApp);
 }
@@ -669,6 +673,37 @@ function updateMonthLabel() {
 // ============================================
 //  BALANCE & SCALE
 // ============================================
+async function settleUp() {
+  const btn = document.getElementById('btn-settle');
+  const net = parseFloat(btn.dataset.net || '0');
+  if (Math.abs(net) < 0.01) return;
+
+  const debtor  = net > 0 ? LABEL_B : LABEL_A;
+  const creditor = net > 0 ? LABEL_A : LABEL_B;
+  const amount  = Math.abs(net).toFixed(2);
+
+  if (!confirm(`${debtor} ha dato €${amount} a ${creditor}?\nViene registrato il pareggio.`)) return;
+
+  const today = new Date().toISOString().split('T')[0];
+  // The debtor pays an expense that's 100% the creditor's share → net goes to 0
+  const paidBy     = net > 0 ? PERSON_B : PERSON_A;
+  const splitMarco = net > 0 ? 100 : 0;
+  const splitSara  = net > 0 ? 0   : 100;
+
+  const { error } = await db.from('expenses').insert({
+    amount: parseFloat(amount),
+    description: 'Pareggio conti 🤝',
+    date: today,
+    paid_by: paidBy,
+    category: 'saldo',
+    split_marco: splitMarco,
+    split_sara:  splitSara,
+  });
+
+  if (error) { alert('Errore: ' + error.message); return; }
+  await renderHome(true);
+}
+
 function updateBalance(expenses, allowConfetti = false) {
   // For each expense, compute what Marco and Sara each owe
   // paid_by is who actually paid; split determines the share each should pay
@@ -693,6 +728,9 @@ function updateBalance(expenses, allowConfetti = false) {
   const beam = document.getElementById('scale-beam');
   const marcoCredit = document.getElementById('marco-credit');
   const saraCredit  = document.getElementById('sara-credit');
+  const settleBtn = document.getElementById('btn-settle');
+  settleBtn.dataset.net = net.toFixed(4);
+  settleBtn.classList.toggle('hidden', absNet < 0.01 || expenses.length === 0);
 
   marcoCredit.textContent = `€${absNet > 0 && net > 0 ? absNet.toFixed(2) : '0.00'}`;
   saraCredit.textContent  = `€${absNet > 0 && net < 0 ? absNet.toFixed(2) : '0.00'}`;

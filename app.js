@@ -88,10 +88,142 @@ function applySeasonTheme() {
   if (!seasonEnabled) {
     document.body.classList.add('no-season');
     document.getElementById('btn-season-toggle').textContent = '🎨';
+  } else {
+    document.body.classList.add(season);
+    document.getElementById('btn-season-toggle').textContent = getSeasonEmoji(season);
+  }
+  // Holidays override season palette — apply after so class order wins
+  applyHoliday();
+}
+
+// ============================================
+//  HOLIDAY DETECTION
+// ============================================
+
+// Computus — Easter Sunday for a given year
+function easterDate(year) {
+  const a = year % 19, b = Math.floor(year / 100), c = year % 100;
+  const d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25);
+  const g = Math.floor((b - f + 1) / 3), h = (19*a + b - d - g + 15) % 30;
+  const i = Math.floor(c / 4), k = c % 4, l = (32 + 2*e + 2*i - h - k) % 7;
+  const m = Math.floor((a + 11*h + 22*l) / 451);
+  const month = Math.floor((h + l - 7*m + 114) / 31) - 1; // 0-indexed
+  const day   = ((h + l - 7*m + 114) % 31) + 1;
+  return { month, day };
+}
+
+const HOLIDAYS = [
+  {
+    id: 'natale',
+    emoji: '🎄',
+    label: 'Buon Natale! 🎄🎁',
+    decos: ['🎄','❄️','⭐','🎁','🔔','🕯️'],
+    confetti: ['#C0392B','#1E8449','#F4D03F','#FFFFFF','#E74C3C','#27AE60'],
+    match: (d) => d.month === 11 && d.day >= 20 && d.day <= 26,
+  },
+  {
+    id: 'capodanno',
+    emoji: '🎆',
+    label: 'Felice Anno Nuovo! 🎆✨',
+    decos: ['🎆','✨','🥂','🎇','⭐','🎊'],
+    confetti: ['#9B59B6','#D4AC0D','#FFFFFF','#E8DAEF','#F9CA24','#6C5CE7'],
+    match: (d) => (d.month === 11 && d.day >= 27) || (d.month === 0 && d.day <= 2),
+  },
+  {
+    id: 'epifania',
+    emoji: '⭐',
+    label: 'Buona Epifania! ⭐🍬',
+    decos: ['⭐','🌟','✨','🍬','🎁','👑'],
+    confetti: ['#1A5276','#D4AC0D','#AED6F1','#FCF3CF','#2471A3','#F7DC6F'],
+    match: (d) => d.month === 0 && d.day === 6,
+  },
+  {
+    id: 'sanvalentino',
+    emoji: '❤️',
+    label: 'Buon San Valentino! ❤️🌹',
+    decos: ['❤️','🌹','💕','💝','🌸','💋'],
+    confetti: ['#C0392B','#E91E8C','#FADADD','#FF6B9D','#FF1744','#F48FB1'],
+    match: (d) => d.month === 1 && d.day === 14,
+  },
+  {
+    id: 'pasqua',
+    emoji: '🐣',
+    label: 'Buona Pasqua! 🐣🌷',
+    decos: ['🐣','🌷','🥚','🌸','🐇','🌿'],
+    confetti: ['#7D3C98','#28B463','#F9E79F','#E8DAEF','#A9DFBF','#FAD7A0'],
+    match: (d) => {
+      const e = easterDate(d.year);
+      const diff = (d.month - e.month) * 30 + (d.day - e.day);
+      return diff >= -1 && diff <= 1; // Sabato Santo, Pasqua, Pasquetta
+    },
+  },
+  {
+    id: 'ferragosto',
+    emoji: '🏖️',
+    label: 'Buon Ferragosto! 🏖️☀️',
+    decos: ['🏖️','☀️','🌊','🍦','🌴','🕶️'],
+    confetti: ['#1565C0','#F9A825','#BBDEFB','#FFF9C4','#29B6F6','#FFEE58'],
+    match: (d) => d.month === 7 && d.day >= 14 && d.day <= 16,
+  },
+  {
+    id: 'halloween',
+    emoji: '🎃',
+    label: 'Happy Halloween! 🎃👻',
+    decos: ['🎃','👻','🦇','🕷️','🌙','💀'],
+    confetti: ['#E65100','#6A1B9A','#FFD180','#CE93D8','#FF6D00','#9C27B0'],
+    match: (d) => d.month === 9 && d.day >= 28,
+  },
+];
+
+let activeHoliday = null;
+let decoIntervals = [];
+
+function getHoliday() {
+  const now = new Date();
+  const d = { month: now.getMonth(), day: now.getDate(), year: now.getFullYear() };
+  return HOLIDAYS.find(h => h.match(d)) || null;
+}
+
+function applyHoliday() {
+  // Clear previous decos
+  decoIntervals.forEach(id => clearInterval(id));
+  decoIntervals = [];
+  document.querySelectorAll('.holiday-deco').forEach(el => el.remove());
+
+  activeHoliday = getHoliday();
+  const banner = document.getElementById('holiday-banner');
+  const text   = document.getElementById('holiday-text');
+
+  // Remove all holiday classes
+  HOLIDAYS.forEach(h => document.body.classList.remove('holiday-' + h.id));
+
+  if (!activeHoliday) {
+    banner.classList.add('hidden');
     return;
   }
-  document.body.classList.add(season);
-  document.getElementById('btn-season-toggle').textContent = getSeasonEmoji(season);
+
+  document.body.classList.add('holiday-' + activeHoliday.id);
+  text.textContent = activeHoliday.label;
+  banner.classList.remove('hidden');
+
+  // Floating decorations — spawn one every 2s, max 6 on screen
+  let onScreen = 0;
+  const spawnDeco = () => {
+    if (onScreen >= 6) return;
+    onScreen++;
+    const el = document.createElement('span');
+    el.className = 'holiday-deco';
+    el.textContent = activeHoliday.decos[Math.floor(Math.random() * activeHoliday.decos.length)];
+    el.style.left  = Math.random() * 90 + '%';
+    el.style.top   = '-2rem';
+    const dur = 6 + Math.random() * 6;
+    el.style.animationDuration = dur + 's';
+    el.style.fontSize = (0.9 + Math.random() * 0.8) + 'rem';
+    document.body.appendChild(el);
+    setTimeout(() => { el.remove(); onScreen--; }, dur * 1000);
+  };
+  decoIntervals.push(setInterval(spawnDeco, 2200));
+  spawnDeco(); // first one immediately
 }
 
 // ============================================
@@ -873,11 +1005,14 @@ function showConfetti() {
   canvas.height = window.innerHeight;
   const ctx = canvas.getContext('2d');
 
+  const confettiColors = activeHoliday
+    ? activeHoliday.confetti
+    : ['#E8629A','#6BBF8E','#F4844B','#4BADE0','#F4C842'];
   const pieces = Array.from({ length: 80 }, () => ({
     x: Math.random() * canvas.width,
     y: -20,
     r: Math.random() * 8 + 4,
-    color: ['#E8629A','#6BBF8E','#F4844B','#4BADE0','#F4C842'][Math.floor(Math.random() * 5)],
+    color: confettiColors[Math.floor(Math.random() * confettiColors.length)],
     speed: Math.random() * 3 + 2,
     swing: Math.random() * 3 - 1.5,
     rot: Math.random() * 360,

@@ -357,6 +357,75 @@ function setCategoryInGrid(containerId, catId) {
 }
 
 // ============================================
+//  SPLIT SYNC HELPER
+// ============================================
+
+// Given slider/pct-a/eur-a/eur-b IDs and the total-amount input ID,
+// wires up full bidirectional sync: slider ↔ pct ↔ €
+function initSplitSync(ids) {
+  const { slider, pctA, pctB, eurA, eurB, totalId } = ids;
+
+  const getTotal = () => parseFloat(document.getElementById(totalId)?.value) || 0;
+
+  // Set all fields from a percentage for A (0-100, integer)
+  function applyPct(pA, source) {
+    const pB = 100 - pA;
+    const total = getTotal();
+    if (source !== 'slider') document.getElementById(slider).value = pA;
+    if (source !== 'pctA')   document.getElementById(pctA).value  = pA;
+    if (source !== 'pctB')   document.getElementById(pctB).value  = pB;
+    if (total > 0) {
+      if (source !== 'eurA') document.getElementById(eurA).value = (total * pA / 100).toFixed(2);
+      if (source !== 'eurB') document.getElementById(eurB).value = (total * pB / 100).toFixed(2);
+    }
+  }
+
+  // Slider moved
+  document.getElementById(slider).addEventListener('input', () => {
+    applyPct(parseInt(document.getElementById(slider).value), 'slider');
+  });
+
+  // pct-A typed
+  document.getElementById(pctA).addEventListener('input', () => {
+    let v = Math.min(100, Math.max(0, parseInt(document.getElementById(pctA).value) || 0));
+    applyPct(v, 'pctA');
+  });
+
+  // pct-B typed
+  document.getElementById(pctB).addEventListener('input', () => {
+    let v = Math.min(100, Math.max(0, parseInt(document.getElementById(pctB).value) || 0));
+    applyPct(100 - v, 'pctB');
+  });
+
+  // eur-A typed
+  document.getElementById(eurA).addEventListener('input', () => {
+    const total = getTotal();
+    if (!total) return;
+    const eA = Math.min(total, Math.max(0, parseFloat(document.getElementById(eurA).value) || 0));
+    const pA = Math.round(eA / total * 100);
+    document.getElementById(eurB).value = (total - eA).toFixed(2);
+    applyPct(pA, 'eurA');
+  });
+
+  // eur-B typed
+  document.getElementById(eurB).addEventListener('input', () => {
+    const total = getTotal();
+    if (!total) return;
+    const eB = Math.min(total, Math.max(0, parseFloat(document.getElementById(eurB).value) || 0));
+    const pA = Math.round((total - eB) / total * 100);
+    document.getElementById(eurA).value = (total - eB).toFixed(2);
+    applyPct(pA, 'eurB');
+  });
+
+  // When total amount changes, recalculate euro fields
+  if (totalId) {
+    document.getElementById(totalId)?.addEventListener('input', () => {
+      applyPct(parseInt(document.getElementById(slider).value), 'total');
+    });
+  }
+}
+
+// ============================================
 //  FORM LISTENERS
 // ============================================
 function initFormListeners() {
@@ -378,18 +447,11 @@ function initFormListeners() {
     });
   });
 
-  // Split slider
-  const splitSlider = document.getElementById('f-split');
-  splitSlider.addEventListener('input', () => {
-    document.getElementById('split-display').textContent =
-      `${LABEL_A} ${splitSlider.value}% / ${LABEL_B} ${100 - splitSlider.value}%`;
-  });
+  // Split sync — expense form
+  initSplitSync({ slider: 'f-split', pctA: 'f-pct-a', pctB: 'f-pct-b', eurA: 'f-eur-a', eurB: 'f-eur-b', totalId: 'f-amount' });
 
-  const rfSplitSlider = document.getElementById('rf-split');
-  rfSplitSlider.addEventListener('input', () => {
-    document.getElementById('rf-split-display').textContent =
-      `${LABEL_A} ${rfSplitSlider.value}% / ${LABEL_B} ${100 - rfSplitSlider.value}%`;
-  });
+  // Split sync — recurring form
+  initSplitSync({ slider: 'rf-split', pctA: 'rf-pct-a', pctB: 'rf-pct-b', eurA: 'rf-eur-a', eurB: 'rf-eur-b', totalId: 'rf-amount' });
 
   // Auto-detect category from description
   const descInput = document.getElementById('f-desc');
@@ -436,8 +498,11 @@ function initFormListeners() {
     showReceipt(data);
     document.getElementById('expense-form').reset();
     document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
-    document.getElementById('f-split').value = DEFAULT_SPLIT_A;
-    document.getElementById('split-display').textContent = `${LABEL_A} ${DEFAULT_SPLIT_A}% / ${LABEL_B} ${DEFAULT_SPLIT_B}%`;
+    document.getElementById('f-split').value  = DEFAULT_SPLIT_A;
+    document.getElementById('f-pct-a').value  = DEFAULT_SPLIT_A;
+    document.getElementById('f-pct-b').value  = DEFAULT_SPLIT_B;
+    document.getElementById('f-eur-a').value  = '';
+    document.getElementById('f-eur-b').value  = '';
     selectedPayer = PERSON_A;
     selectedCategory = 'altro';
     document.querySelectorAll('#expense-form .payer-btn').forEach((b, i) => b.classList.toggle('active', i === 0));

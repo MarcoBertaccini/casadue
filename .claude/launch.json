@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "casadue",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "-l", "3999", "C:/Users/Marco/casadue"],
+      "port": 3999
+    }
+  ]
+}

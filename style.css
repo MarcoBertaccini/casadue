@@ -187,9 +187,6 @@ body {
   color: white;
   padding: 1rem 1rem 1.5rem;
   border-radius: 0 0 2rem 2rem;
-  position: sticky;
-  top: 0;
-  z-index: 100;
   box-shadow: 0 4px 20px rgba(0,0,0,0.12);
 }
 
@@ -656,6 +653,7 @@ body {
   font-size: 0.85rem;
   font-weight: 800;
   color: var(--c-text-soft);
+  margin-bottom: 0.6rem;
 }
 
 .split-slider-wrap input[type="range"] {
@@ -664,6 +662,80 @@ body {
   height: 6px;
   cursor: pointer;
 }
+
+/* Split rows (% + € per person) */
+.split-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.split-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: var(--c-bg);
+  border-radius: 0.75rem;
+  padding: 0.4rem 0.6rem;
+}
+
+.split-name {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--c-text-soft);
+  width: 2.8rem;
+  flex-shrink: 0;
+}
+
+.split-pct {
+  width: 3.2rem;
+  padding: 0.3rem 0.4rem;
+  border: 1.5px solid var(--c-border);
+  border-radius: 0.5rem;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  background: var(--c-card);
+  color: var(--c-text);
+  text-align: center;
+  outline: none;
+  -moz-appearance: textfield;
+}
+.split-pct::-webkit-inner-spin-button,
+.split-pct::-webkit-outer-spin-button { -webkit-appearance: none; }
+.split-pct:focus { border-color: var(--c-primary); }
+
+.split-unit {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--c-text-soft);
+  flex-shrink: 0;
+}
+
+.split-eq {
+  font-size: 0.8rem;
+  color: var(--c-text-soft);
+  flex-shrink: 0;
+  margin: 0 0.1rem;
+}
+
+.split-eur {
+  flex: 1;
+  min-width: 0;
+  padding: 0.3rem 0.4rem;
+  border: 1.5px solid var(--c-border);
+  border-radius: 0.5rem;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  background: var(--c-card);
+  color: var(--c-text);
+  outline: none;
+  -moz-appearance: textfield;
+}
+.split-eur::-webkit-inner-spin-button,
+.split-eur::-webkit-outer-spin-button { -webkit-appearance: none; }
+.split-eur:focus { border-color: var(--c-primary); }
 
 /* Buttons */
 .btn-primary {

@@ -512,7 +512,7 @@ function initFormListeners() {
     viewMonth = new Date(date).getMonth();
     viewYear  = new Date(date).getFullYear();
     navigateTo('home');
-    await renderHome();
+    await renderHome(true); // allowConfetti: user just saved a real expense
   });
 
   // Recurring form
@@ -546,25 +546,29 @@ function initFormListeners() {
     await loadRecurringAlerts();
   });
 
-  // Month navigation
+  // Month navigation (home) — capped at current month
   document.getElementById('prev-month').addEventListener('click', () => {
     if (viewMonth === 0) { viewMonth = 11; viewYear--; }
     else viewMonth--;
     renderHome();
   });
   document.getElementById('next-month').addEventListener('click', () => {
+    const now = new Date();
+    if (viewYear > now.getFullYear() || (viewYear === now.getFullYear() && viewMonth >= now.getMonth())) return;
     if (viewMonth === 11) { viewMonth = 0; viewYear++; }
     else viewMonth++;
     renderHome();
   });
 
-  // Stats month navigation
+  // Stats month navigation — capped at current month
   document.getElementById('stats-prev-month').addEventListener('click', () => {
     if (statsMonth === 0) { statsMonth = 11; statsYear--; }
     else statsMonth--;
     renderStats();
   });
   document.getElementById('stats-next-month').addEventListener('click', () => {
+    const now = new Date();
+    if (statsYear > now.getFullYear() || (statsYear === now.getFullYear() && statsMonth >= now.getMonth())) return;
     if (statsMonth === 11) { statsMonth = 0; statsYear++; }
     else statsMonth++;
     renderStats();
@@ -575,6 +579,9 @@ function initFormListeners() {
     seasonEnabled = !seasonEnabled;
     applySeasonTheme();
   });
+
+  // Close "Aggiungi spesa" without saving
+  document.getElementById('btn-close-add').addEventListener('click', () => navigateTo('home'));
 
   // Logout
   document.getElementById('btn-logout').addEventListener('click', lockApp);
@@ -604,7 +611,7 @@ async function navigateTo(page) {
 // ============================================
 //  HOME — expense list
 // ============================================
-async function renderHome() {
+async function renderHome(allowConfetti = false) {
   updateMonthLabel();
   const from = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-01`;
   const to   = new Date(viewYear, viewMonth + 1, 0).toISOString().split('T')[0];
@@ -648,18 +655,21 @@ async function renderHome() {
     });
   });
 
-  updateBalance(expenses);
+  updateBalance(expenses, allowConfetti);
 }
 
 function updateMonthLabel() {
   const label = new Date(viewYear, viewMonth, 1).toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
   document.getElementById('month-label').textContent = label.charAt(0).toUpperCase() + label.slice(1);
+  const now = new Date();
+  document.getElementById('next-month').disabled =
+    viewYear > now.getFullYear() || (viewYear === now.getFullYear() && viewMonth >= now.getMonth());
 }
 
 // ============================================
 //  BALANCE & SCALE
 // ============================================
-function updateBalance(expenses) {
+function updateBalance(expenses, allowConfetti = false) {
   // For each expense, compute what Marco and Sara each owe
   // paid_by is who actually paid; split determines the share each should pay
   // If Marco paid 100 and split is 70/30:
@@ -695,7 +705,7 @@ function updateBalance(expenses) {
   if (absNet < 0.01) {
     balanceText.textContent = reaction;
     beam.className = 'scale-beam balanced';
-    showConfetti();
+    if (allowConfetti && expenses.length > 0) showConfetti();
   } else if (net > 0) {
     balanceText.textContent = `${LABEL_B} deve a ${LABEL_A} €${absNet.toFixed(2)} — ${reaction}`;
     beam.className = 'scale-beam tilt-left';
@@ -928,6 +938,9 @@ async function renderStats() {
 function updateStatsMonthLabel() {
   const label = new Date(statsYear, statsMonth, 1).toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
   document.getElementById('stats-month-label').textContent = label.charAt(0).toUpperCase() + label.slice(1);
+  const now = new Date();
+  document.getElementById('stats-next-month').disabled =
+    statsYear > now.getFullYear() || (statsYear === now.getFullYear() && statsMonth >= now.getMonth());
 }
 
 function buildDonut(catEntries, total, colors) {

@@ -376,6 +376,52 @@ body {
   margin-bottom: 1.25rem;
 }
 
+/* Add-expense page: header row with X button */
+.page-add-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.btn-close-page {
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  border: 2px solid var(--c-border);
+  background: var(--c-card);
+  color: var(--c-text-soft);
+  font-size: 1rem;
+  font-weight: 900;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+.btn-close-page:hover {
+  background: var(--c-primary-lt);
+  border-color: var(--c-primary);
+  color: var(--c-primary);
+}
+
+/* Slide-up entrance for add page */
+#page-add.active {
+  animation: slide-in-bottom 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes slide-in-bottom {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Disabled month-nav button */
+.month-nav:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 /* ============================================
    MONTH FILTER
    ============================================ */

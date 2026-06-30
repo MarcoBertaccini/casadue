@@ -487,8 +487,19 @@ function initFormListeners() {
       split_sara: 100 - splitVal,
     };
 
-    const { data, error } = await db.from('expenses').insert(expense).select().single();
-    if (error) { alert('Errore nel salvataggio: ' + error.message); return; }
+    let data, error;
+    try {
+      ({ data, error } = await db.from('expenses').insert(expense).select().single());
+    } catch (err) {
+      console.error('Eccezione di rete/client durante il salvataggio della spesa:', err);
+      alert('Errore di connessione: ' + err.message);
+      return;
+    }
+    if (error) {
+      console.error('Errore Supabase nel salvataggio della spesa:', error);
+      alert('Errore nel salvataggio: ' + error.message);
+      return;
+    }
 
     // Learn keyword from first word of description
     const firstWord = desc.split(/\s+/)[0];
@@ -530,16 +541,27 @@ function initFormListeners() {
     const day     = parseInt(document.getElementById('rf-day').value);
     const splitVal = parseInt(document.getElementById('rf-split').value);
 
-    const { error } = await db.from('recurring_expenses').insert({
-      description: desc,
-      amount,
-      day_of_month: day,
-      paid_by: rfSelectedPayer,
-      category: rfSelectedCategory,
-      split_marco: splitVal,
-      split_sara: 100 - splitVal,
-    });
-    if (error) { alert('Errore: ' + error.message); return; }
+    let error;
+    try {
+      ({ error } = await db.from('recurring_expenses').insert({
+        description: desc,
+        amount,
+        day_of_month: day,
+        paid_by: rfSelectedPayer,
+        category: rfSelectedCategory,
+        split_marco: splitVal,
+        split_sara: 100 - splitVal,
+      }));
+    } catch (err) {
+      console.error('Eccezione di rete/client durante il salvataggio della spesa fissa:', err);
+      alert('Errore di connessione: ' + err.message);
+      return;
+    }
+    if (error) {
+      console.error('Errore Supabase nel salvataggio della spesa fissa:', error);
+      alert('Errore: ' + error.message);
+      return;
+    }
 
     document.getElementById('recurring-modal').classList.add('hidden');
     document.getElementById('recurring-form').reset();
@@ -690,17 +712,27 @@ async function settleUp() {
   const splitMarco = net > 0 ? 100 : 0;
   const splitSara  = net > 0 ? 0   : 100;
 
-  const { error } = await db.from('expenses').insert({
-    amount: parseFloat(amount),
-    description: 'Pareggio conti 🤝',
-    date: today,
-    paid_by: paidBy,
-    category: 'saldo',
-    split_marco: splitMarco,
-    split_sara:  splitSara,
-  });
-
-  if (error) { alert('Errore: ' + error.message); return; }
+  let error;
+  try {
+    ({ error } = await db.from('expenses').insert({
+      amount: parseFloat(amount),
+      description: 'Pareggio conti 🤝',
+      date: today,
+      paid_by: paidBy,
+      category: 'saldo',
+      split_marco: splitMarco,
+      split_sara:  splitSara,
+    }));
+  } catch (err) {
+    console.error('Eccezione di rete/client durante il pareggio conti:', err);
+    alert('Errore di connessione: ' + err.message);
+    return;
+  }
+  if (error) {
+    console.error('Errore Supabase nel pareggio conti:', error);
+    alert('Errore: ' + error.message);
+    return;
+  }
   await renderHome(true);
 }
 

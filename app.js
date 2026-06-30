@@ -640,7 +640,7 @@ async function navigateTo(page) {
 async function renderHome(allowConfetti = false) {
   updateMonthLabel();
   const from = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-01`;
-  const to   = new Date(viewYear, viewMonth + 1, 0).toISOString().split('T')[0];
+  const to   = `${viewYear}-${String(viewMonth + 1).padStart(2,'0')}-${String(new Date(viewYear, viewMonth + 1, 0).getDate()).padStart(2,'0')}`;
 
   const { data: expenses } = await db.from('expenses')
     .select('*').gte('date', from).lte('date', to).order('date', { ascending: false });
@@ -893,7 +893,7 @@ async function checkAndGenerateRecurring() {
 async function renderStats() {
   updateStatsMonthLabel();
   const from = `${statsYear}-${String(statsMonth + 1).padStart(2, '0')}-01`;
-  const to   = new Date(statsYear, statsMonth + 1, 0).toISOString().split('T')[0];
+  const to   = `${statsYear}-${String(statsMonth + 1).padStart(2,'0')}-${String(new Date(statsYear, statsMonth + 1, 0).getDate()).padStart(2,'0')}`;
 
   const { data: expenses } = await db.from('expenses').select('*').gte('date', from).lte('date', to);
 

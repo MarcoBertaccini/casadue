@@ -294,9 +294,9 @@ async function initApp() {
   initFormListeners();
   initNavigation();
   initDateDefault();
+  await checkAndGenerateRecurring(); // must run before alerts so DB is up-to-date
   await loadRecurringAlerts();
   await renderHome();
-  checkAndGenerateRecurring();
 }
 
 function initDateDefault() {

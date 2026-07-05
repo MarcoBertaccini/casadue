@@ -576,6 +576,7 @@ body {
   font-weight: 700;
 }
 
+.expense-card .edit-btn,
 .expense-card .delete-btn {
   background: none;
   border: none;
@@ -586,8 +587,30 @@ body {
   border-radius: 0.5rem;
   opacity: 0.5;
   transition: opacity 0.2s, color 0.2s;
+  flex-shrink: 0;
 }
+.expense-card .edit-btn:hover   { opacity: 1; color: var(--c-primary); }
 .expense-card .delete-btn:hover { opacity: 1; color: #E05050; }
+
+/* Carryover balance from previous months */
+.carryover-card {
+  background: var(--c-accent-lt);
+  border-left: 4px solid var(--c-accent);
+  border-radius: 0.75rem;
+  padding: 0.55rem 0.9rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--c-text);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.5rem;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+.carryover-amount {
+  font-weight: 800;
+  color: var(--c-primary);
+}
 
 .empty-state {
   text-align: center;

@@ -60,6 +60,8 @@ let selectedCategory = 'altro';
 let rfSelectedCategory = 'affitto';
 let learnedKeywords = {};
 let seasonEnabled = true;
+let editingExpenseId = null;
+let editingRecurringId = null;
 
 // ---- DOM refs ----
 const pinScreen  = document.getElementById('pin-screen');
@@ -68,6 +70,14 @@ const pinDigits  = document.querySelectorAll('.pin-digit');
 const pinError   = document.getElementById('pin-error');
 const pages      = document.querySelectorAll('.page');
 const navItems   = document.querySelectorAll('.nav-item');
+
+// ============================================
+//  UTILITY
+// ============================================
+function getTodayLocal() {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+}
 
 // ============================================
 //  SEASON THEMING
@@ -290,8 +300,7 @@ async function initApp() {
 }
 
 function initDateDefault() {
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById('f-date').value = today;
+  document.getElementById('f-date').value = getTodayLocal();
 }
 
 // ============================================
@@ -427,6 +436,86 @@ function initSplitSync(ids) {
 }
 
 // ============================================
+//  FORM HELPERS
+// ============================================
+function resetExpenseForm() {
+  document.getElementById('expense-form').reset();
+  document.getElementById('f-date').value   = getTodayLocal();
+  document.getElementById('f-split').value  = DEFAULT_SPLIT_A;
+  document.getElementById('f-pct-a').value  = DEFAULT_SPLIT_A;
+  document.getElementById('f-pct-b').value  = DEFAULT_SPLIT_B;
+  document.getElementById('f-eur-a').value  = '';
+  document.getElementById('f-eur-b').value  = '';
+  selectedPayer    = PERSON_A;
+  selectedCategory = 'altro';
+  document.querySelectorAll('#expense-form .payer-btn').forEach((b, i) => b.classList.toggle('active', i === 0));
+  setCategoryInGrid('category-grid', 'altro');
+  document.getElementById('category-preview').innerHTML = '';
+}
+
+function setAddPageMode(isEdit) {
+  document.querySelector('#page-add .page-title').textContent =
+    isEdit ? 'Modifica spesa' : 'Nuova spesa';
+  document.querySelector('#expense-form button[type="submit"]').textContent =
+    isEdit ? 'Salva modifiche 💾' : 'Salva spesa 💾';
+}
+
+function openEditExpense(expense) {
+  editingExpenseId = expense.id;
+
+  document.getElementById('f-amount').value = expense.amount;
+  document.getElementById('f-desc').value   = expense.description;
+  document.getElementById('f-date').value   = expense.date;
+  document.getElementById('f-split').value  = expense.split_marco;
+  document.getElementById('f-pct-a').value  = expense.split_marco;
+  document.getElementById('f-pct-b').value  = expense.split_sara;
+  const total = parseFloat(expense.amount);
+  document.getElementById('f-eur-a').value  = (total * expense.split_marco / 100).toFixed(2);
+  document.getElementById('f-eur-b').value  = (total * expense.split_sara  / 100).toFixed(2);
+
+  selectedPayer = expense.paid_by;
+  document.querySelectorAll('#expense-form .payer-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.payer === expense.paid_by));
+
+  selectedCategory = expense.category;
+  setCategoryInGrid('category-grid', expense.category);
+  document.getElementById('category-preview').innerHTML = '';
+
+  setAddPageMode(true);
+
+  // Switch page directly — bypass navigateTo so it doesn't reset editingExpenseId
+  currentPage = 'add';
+  pages.forEach(p => p.classList.remove('active'));
+  navItems.forEach(n => n.classList.remove('active'));
+  document.getElementById('page-add').classList.add('active');
+  document.querySelector('[data-page="add"]').classList.add('active');
+}
+
+function openEditRecurring(r) {
+  editingRecurringId = r.id;
+
+  document.getElementById('rf-desc').value   = r.description;
+  document.getElementById('rf-amount').value = r.amount;
+  document.getElementById('rf-day').value    = r.day_of_month;
+  document.getElementById('rf-split').value  = r.split_marco;
+  document.getElementById('rf-pct-a').value  = r.split_marco;
+  document.getElementById('rf-pct-b').value  = r.split_sara;
+  const total = parseFloat(r.amount);
+  document.getElementById('rf-eur-a').value  = (total * r.split_marco / 100).toFixed(2);
+  document.getElementById('rf-eur-b').value  = (total * r.split_sara  / 100).toFixed(2);
+
+  rfSelectedPayer = r.paid_by;
+  document.querySelectorAll('#recurring-form .payer-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.payer === r.paid_by));
+
+  rfSelectedCategory = r.category;
+  setCategoryInGrid('rf-category-grid', r.category);
+
+  document.querySelector('#recurring-modal h3').textContent = 'Modifica spesa fissa';
+  document.getElementById('recurring-modal').classList.remove('hidden');
+}
+
+// ============================================
 //  FORM LISTENERS
 // ============================================
 function initFormListeners() {
@@ -469,7 +558,7 @@ function initFormListeners() {
     }
   });
 
-  // Expense form submit
+  // Expense form submit (handles both new insert and edit update)
   document.getElementById('expense-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const amount   = parseFloat(document.getElementById('f-amount').value);
@@ -477,7 +566,7 @@ function initFormListeners() {
     const date     = document.getElementById('f-date').value;
     const splitVal = parseInt(document.getElementById('f-split').value);
 
-    const expense = {
+    const expenseData = {
       amount,
       description: desc,
       date,
@@ -487,9 +576,14 @@ function initFormListeners() {
       split_sara: 100 - splitVal,
     };
 
+    const isEditing = !!editingExpenseId;
     let data, error;
     try {
-      ({ data, error } = await db.from('expenses').insert(expense).select().single());
+      if (isEditing) {
+        ({ data, error } = await db.from('expenses').update(expenseData).eq('id', editingExpenseId).select().single());
+      } else {
+        ({ data, error } = await db.from('expenses').insert(expenseData).select().single());
+      }
     } catch (err) {
       console.error('Eccezione di rete/client durante il salvataggio della spesa:', err);
       alert('Errore di connessione: ' + err.message);
@@ -501,57 +595,55 @@ function initFormListeners() {
       return;
     }
 
-    // Learn keyword from first word of description
-    const firstWord = desc.split(/\s+/)[0];
-    if (firstWord && firstWord.length > 2) {
-      await learnKeyword(firstWord, selectedCategory);
+    if (!isEditing) {
+      const firstWord = desc.split(/\s+/)[0];
+      if (firstWord && firstWord.length > 2) await learnKeyword(firstWord, selectedCategory);
+      showReceipt(data);
     }
 
-    showReceipt(data);
-    document.getElementById('expense-form').reset();
-    document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
-    document.getElementById('f-split').value  = DEFAULT_SPLIT_A;
-    document.getElementById('f-pct-a').value  = DEFAULT_SPLIT_A;
-    document.getElementById('f-pct-b').value  = DEFAULT_SPLIT_B;
-    document.getElementById('f-eur-a').value  = '';
-    document.getElementById('f-eur-b').value  = '';
-    selectedPayer = PERSON_A;
-    selectedCategory = 'altro';
-    document.querySelectorAll('#expense-form .payer-btn').forEach((b, i) => b.classList.toggle('active', i === 0));
-    setCategoryInGrid('category-grid', 'altro');
-    document.getElementById('category-preview').innerHTML = '';
+    editingExpenseId = null;
+    setAddPageMode(false);
+    resetExpenseForm();
 
-    viewMonth = new Date(date).getMonth();
-    viewYear  = new Date(date).getFullYear();
-    navigateTo('home');
-    await renderHome(true); // allowConfetti: user just saved a real expense
+    viewMonth = new Date(date + 'T00:00:00').getMonth();
+    viewYear  = new Date(date + 'T00:00:00').getFullYear();
+    await navigateTo('home', !isEditing); // confetti only for new expenses
   });
 
   // Recurring form
   document.getElementById('btn-add-recurring').addEventListener('click', () => {
+    editingRecurringId = null;
+    document.querySelector('#recurring-modal h3').textContent = 'Spesa fissa';
     document.getElementById('recurring-modal').classList.remove('hidden');
   });
   document.getElementById('btn-cancel-recurring').addEventListener('click', () => {
+    editingRecurringId = null;
+    document.querySelector('#recurring-modal h3').textContent = 'Spesa fissa';
     document.getElementById('recurring-modal').classList.add('hidden');
   });
   document.getElementById('recurring-form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const desc    = document.getElementById('rf-desc').value.trim();
-    const amount  = parseFloat(document.getElementById('rf-amount').value);
-    const day     = parseInt(document.getElementById('rf-day').value);
+    const desc     = document.getElementById('rf-desc').value.trim();
+    const amount   = parseFloat(document.getElementById('rf-amount').value);
+    const day      = parseInt(document.getElementById('rf-day').value);
     const splitVal = parseInt(document.getElementById('rf-split').value);
+    const recurringData = {
+      description: desc,
+      amount,
+      day_of_month: day,
+      paid_by: rfSelectedPayer,
+      category: rfSelectedCategory,
+      split_marco: splitVal,
+      split_sara: 100 - splitVal,
+    };
 
     let error;
     try {
-      ({ error } = await db.from('recurring_expenses').insert({
-        description: desc,
-        amount,
-        day_of_month: day,
-        paid_by: rfSelectedPayer,
-        category: rfSelectedCategory,
-        split_marco: splitVal,
-        split_sara: 100 - splitVal,
-      }));
+      if (editingRecurringId) {
+        ({ error } = await db.from('recurring_expenses').update(recurringData).eq('id', editingRecurringId));
+      } else {
+        ({ error } = await db.from('recurring_expenses').insert(recurringData));
+      }
     } catch (err) {
       console.error('Eccezione di rete/client durante il salvataggio della spesa fissa:', err);
       alert('Errore di connessione: ' + err.message);
@@ -563,6 +655,8 @@ function initFormListeners() {
       return;
     }
 
+    editingRecurringId = null;
+    document.querySelector('#recurring-modal h3').textContent = 'Spesa fissa';
     document.getElementById('recurring-modal').classList.add('hidden');
     document.getElementById('recurring-form').reset();
     await renderRecurring();
@@ -604,7 +698,11 @@ function initFormListeners() {
   });
 
   // Close "Aggiungi spesa" without saving
-  document.getElementById('btn-close-add').addEventListener('click', () => navigateTo('home'));
+  document.getElementById('btn-close-add').addEventListener('click', () => {
+    editingExpenseId = null;
+    setAddPageMode(false);
+    navigateTo('home');
+  });
 
   // Settle up
   document.getElementById('btn-settle').addEventListener('click', settleUp);
@@ -618,18 +716,26 @@ function initFormListeners() {
 // ============================================
 function initNavigation() {
   navItems.forEach(item => {
-    item.addEventListener('click', () => navigateTo(item.dataset.page));
+    item.addEventListener('click', () => {
+      // Clicking + nav always opens a fresh form (not edit mode)
+      if (item.dataset.page === 'add') {
+        editingExpenseId = null;
+        setAddPageMode(false);
+        resetExpenseForm();
+      }
+      navigateTo(item.dataset.page);
+    });
   });
 }
 
-async function navigateTo(page) {
+async function navigateTo(page, allowConfetti = false) {
   currentPage = page;
   pages.forEach(p => p.classList.remove('active'));
   navItems.forEach(n => n.classList.remove('active'));
   document.getElementById('page-' + page).classList.add('active');
   document.querySelector(`[data-page="${page}"]`).classList.add('active');
 
-  if (page === 'home')      await renderHome();
+  if (page === 'home')      await renderHome(allowConfetti);
   if (page === 'recurring') await renderRecurring();
   if (page === 'stats')     await renderStats();
 }
@@ -642,46 +748,76 @@ async function renderHome(allowConfetti = false) {
   const from = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-01`;
   const to   = `${viewYear}-${String(viewMonth + 1).padStart(2,'0')}-${String(new Date(viewYear, viewMonth + 1, 0).getDate()).padStart(2,'0')}`;
 
-  const { data: expenses } = await db.from('expenses')
-    .select('*').gte('date', from).lte('date', to).order('date', { ascending: false });
+  // Fetch current month expenses (for the list) and prior expenses (for carryover) in parallel
+  const [{ data: expenses }, { data: priorExpenses }] = await Promise.all([
+    db.from('expenses').select('*').gte('date', from).lte('date', to).order('date', { ascending: false }),
+    db.from('expenses').select('*').lt('date', from),
+  ]);
+
+  const curExpenses  = expenses      || [];
+  const prevExpenses = priorExpenses || [];
+
+  // Compute prior net for the carryover card
+  let priorNet = 0;
+  prevExpenses.forEach(e => {
+    const amt = parseFloat(e.amount);
+    if (e.paid_by === PERSON_A) priorNet += amt * (e.split_sara  / 100);
+    else                        priorNet -= amt * (e.split_marco / 100);
+  });
+
+  const carryoverHtml = Math.abs(priorNet) >= 0.01 ? (() => {
+    const absP = Math.abs(priorNet);
+    const who  = priorNet > 0
+      ? `${LABEL_B} deve a ${LABEL_A} €${absP.toFixed(2)}`
+      : `${LABEL_A} deve a ${LABEL_B} €${absP.toFixed(2)}`;
+    return `<div class="carryover-card">📅 Riporto mesi precedenti <span class="carryover-amount">${who}</span></div>`;
+  })() : '';
 
   const list = document.getElementById('expenses-list');
 
-  if (!expenses || expenses.length === 0) {
-    list.innerHTML = `<div class="empty-state"><div class="empty-icon">🧾</div><p>Nessuna spesa questo mese</p></div>`;
-    updateBalance([]);
-    return;
+  if (curExpenses.length === 0) {
+    list.innerHTML = carryoverHtml +
+      `<div class="empty-state"><div class="empty-icon">🧾</div><p>Nessuna spesa questo mese</p></div>`;
+  } else {
+    list.innerHTML = carryoverHtml + curExpenses.map(e => {
+      const cat = CATEGORIES.find(c => c.id === e.category) || CATEGORIES.at(-1);
+      const dateStr = new Date(e.date + 'T00:00:00').toLocaleDateString('it-IT', { day: '2-digit', month: 'short' });
+      const payerLabel = e.paid_by === PERSON_A ? LABEL_A : LABEL_B;
+      return `
+        <div class="expense-card" data-id="${e.id}">
+          <div class="expense-cat-icon">${cat.emoji}</div>
+          <div class="expense-info">
+            <div class="expense-desc">${e.description}</div>
+            <div class="expense-meta">${dateStr} · ${cat.label} · ${payerLabel} (${e.paid_by === PERSON_A ? e.split_marco : e.split_sara}%)</div>
+          </div>
+          <div class="expense-right">
+            <div class="expense-amount">€${parseFloat(e.amount).toFixed(2)}</div>
+            <div class="expense-payer">pag. ${payerLabel}</div>
+          </div>
+          <button class="edit-btn" data-id="${e.id}" title="Modifica">✏️</button>
+          <button class="delete-btn" data-id="${e.id}" title="Elimina">🗑</button>
+        </div>`;
+    }).join('');
+
+    list.querySelectorAll('.edit-btn').forEach(btn => {
+      btn.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        const expense = curExpenses.find(e => String(e.id) === btn.dataset.id);
+        if (expense) openEditExpense(expense);
+      });
+    });
+    list.querySelectorAll('.delete-btn').forEach(btn => {
+      btn.addEventListener('click', async (ev) => {
+        ev.stopPropagation();
+        if (!confirm('Eliminare questa spesa?')) return;
+        await db.from('expenses').delete().eq('id', btn.dataset.id);
+        await renderHome();
+      });
+    });
   }
 
-  list.innerHTML = expenses.map(e => {
-    const cat = CATEGORIES.find(c => c.id === e.category) || CATEGORIES.at(-1);
-    const dateStr = new Date(e.date + 'T00:00:00').toLocaleDateString('it-IT', { day: '2-digit', month: 'short' });
-    const payerLabel = e.paid_by === PERSON_A ? LABEL_A : LABEL_B;
-    return `
-      <div class="expense-card" data-id="${e.id}">
-        <div class="expense-cat-icon">${cat.emoji}</div>
-        <div class="expense-info">
-          <div class="expense-desc">${e.description}</div>
-          <div class="expense-meta">${dateStr} · ${cat.label} · ${payerLabel} (${e.paid_by === PERSON_A ? e.split_marco : e.split_sara}%)</div>
-        </div>
-        <div class="expense-right">
-          <div class="expense-amount">€${parseFloat(e.amount).toFixed(2)}</div>
-          <div class="expense-payer">pag. ${payerLabel}</div>
-        </div>
-        <button class="delete-btn" data-id="${e.id}" title="Elimina">🗑</button>
-      </div>`;
-  }).join('');
-
-  list.querySelectorAll('.delete-btn').forEach(btn => {
-    btn.addEventListener('click', async (ev) => {
-      ev.stopPropagation();
-      if (!confirm('Eliminare questa spesa?')) return;
-      await db.from('expenses').delete().eq('id', btn.dataset.id);
-      await renderHome();
-    });
-  });
-
-  updateBalance(expenses, allowConfetti);
+  // Balance uses ALL expenses (carryover from prior months + current month)
+  updateBalance([...prevExpenses, ...curExpenses], curExpenses.length, allowConfetti);
 }
 
 function updateMonthLabel() {
@@ -700,14 +836,13 @@ async function settleUp() {
   const net = parseFloat(btn.dataset.net || '0');
   if (Math.abs(net) < 0.01) return;
 
-  const debtor  = net > 0 ? LABEL_B : LABEL_A;
+  const debtor   = net > 0 ? LABEL_B : LABEL_A;
   const creditor = net > 0 ? LABEL_A : LABEL_B;
-  const amount  = Math.abs(net).toFixed(2);
+  const amount   = Math.abs(net).toFixed(2);
 
   if (!confirm(`${debtor} ha dato €${amount} a ${creditor}?\nViene registrato il pareggio.`)) return;
 
-  const today = new Date().toISOString().split('T')[0];
-  // The debtor pays an expense that's 100% the creditor's share → net goes to 0
+  const today = getTodayLocal();
   const paidBy     = net > 0 ? PERSON_B : PERSON_A;
   const splitMarco = net > 0 ? 100 : 0;
   const splitSara  = net > 0 ? 0   : 100;
@@ -736,21 +871,15 @@ async function settleUp() {
   await renderHome(true);
 }
 
-function updateBalance(expenses, allowConfetti = false) {
-  // For each expense, compute what Marco and Sara each owe
-  // paid_by is who actually paid; split determines the share each should pay
-  // If Marco paid 100 and split is 70/30:
-  //   Marco advanced 100, his share is 70 → Sara owes Marco 30
-  // Net: positive = Marco is in credit (Sara owes Marco), negative = Sara is in credit
-
+// allExpenses: all expenses used for net calculation (prior months + current month)
+// currentMonthCount: number of expenses in the currently viewed month (for confetti gate)
+function updateBalance(allExpenses, currentMonthCount = 0, allowConfetti = false) {
   let net = 0; // positive → Sara owes Marco, negative → Marco owes Sara
-  expenses.forEach(e => {
+  allExpenses.forEach(e => {
     const amt = parseFloat(e.amount);
     if (e.paid_by === PERSON_A) {
-      // Marco paid; Sara's share = amt * sara_split/100
-      net += amt * (e.split_sara / 100);
+      net += amt * (e.split_sara  / 100);
     } else {
-      // Sara paid; Marco's share = amt * marco_split/100
       net -= amt * (e.split_marco / 100);
     }
   });
@@ -762,7 +891,7 @@ function updateBalance(expenses, allowConfetti = false) {
   const saraCredit  = document.getElementById('sara-credit');
   const settleBtn = document.getElementById('btn-settle');
   settleBtn.dataset.net = net.toFixed(4);
-  settleBtn.classList.toggle('hidden', absNet < 0.01 || expenses.length === 0);
+  settleBtn.classList.toggle('hidden', absNet < 0.01); // show if any cumulative balance
 
   marcoCredit.textContent = `€${absNet > 0 && net > 0 ? absNet.toFixed(2) : '0.00'}`;
   saraCredit.textContent  = `€${absNet > 0 && net < 0 ? absNet.toFixed(2) : '0.00'}`;
@@ -775,7 +904,7 @@ function updateBalance(expenses, allowConfetti = false) {
   if (absNet < 0.01) {
     balanceText.textContent = reaction;
     beam.className = 'scale-beam balanced';
-    if (allowConfetti && expenses.length > 0) showConfetti();
+    if (allowConfetti && currentMonthCount > 0) showConfetti();
   } else if (net > 0) {
     balanceText.textContent = `${LABEL_B} deve a ${LABEL_A} €${absNet.toFixed(2)} — ${reaction}`;
     beam.className = 'scale-beam tilt-left';
@@ -806,12 +935,19 @@ async function renderRecurring() {
           <div class="recurring-meta">€${parseFloat(r.amount).toFixed(2)} · ogni ${r.day_of_month}° · pag. ${payerLabel}</div>
         </div>
         <div class="recurring-actions">
+          <button class="edit-recurring-btn" data-id="${r.id}" title="Modifica">✏️</button>
           <button class="toggle-btn" data-id="${r.id}" data-active="${r.active}" title="${r.active ? 'Disattiva' : 'Attiva'}">${r.active ? '⏸' : '▶️'}</button>
           <button class="delete-recurring-btn" data-id="${r.id}" title="Elimina">🗑</button>
         </div>
       </div>`;
   }).join('');
 
+  list.querySelectorAll('.edit-recurring-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const rec = data.find(r => String(r.id) === btn.dataset.id);
+      if (rec) openEditRecurring(rec);
+    });
+  });
   list.querySelectorAll('.delete-recurring-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
       if (!confirm('Eliminare?')) return;
@@ -904,7 +1040,7 @@ async function renderStats() {
     let y = statsYear;
     while (m < 0) { m += 12; y--; }
     const mFrom = `${y}-${String(m + 1).padStart(2, '0')}-01`;
-    const mTo   = new Date(y, m + 1, 0).toISOString().split('T')[0];
+    const mTo   = `${y}-${String(m + 1).padStart(2,'0')}-${String(new Date(y, m + 1, 0).getDate()).padStart(2,'0')}`;
     const { data: mData } = await db.from('expenses').select('amount').gte('date', mFrom).lte('date', mTo);
     const total = (mData || []).reduce((s, e) => s + parseFloat(e.amount), 0);
     const label = new Date(y, m, 1).toLocaleDateString('it-IT', { month: 'short' });

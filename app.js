@@ -970,7 +970,10 @@ async function loadRecurringAlerts() {
   if (!data || data.length === 0) { alerts.classList.add('hidden'); return; }
 
   const today = new Date();
-  const todayDay = today.getDate();
+  const todayDay  = today.getDate();
+  const thisYear  = today.getFullYear();
+  const thisMonth = today.getMonth() + 1;
+
   const upcoming = data.filter(r => {
     const diff = r.day_of_month - todayDay;
     return diff >= 0 && diff <= 5;
@@ -978,8 +981,23 @@ async function loadRecurringAlerts() {
 
   if (upcoming.length === 0) { alerts.classList.add('hidden'); return; }
 
+  // Only show alert if the expense hasn't already been added this month
+  const from = `${thisYear}-${String(thisMonth).padStart(2,'0')}-01`;
+  const to   = `${thisYear}-${String(thisMonth).padStart(2,'0')}-${new Date(thisYear, thisMonth, 0).getDate()}`;
+  const { data: existing } = await db.from('expenses').select('recurring_id, description').gte('date', from).lte('date', to);
+
+  const existingRecurringIds = new Set((existing || []).filter(e => e.recurring_id).map(e => e.recurring_id));
+  const existingDescriptions = new Set((existing || []).map(e => (e.description || '').toLowerCase().trim()));
+
+  const notYetAdded = upcoming.filter(r =>
+    !existingRecurringIds.has(r.id) &&
+    !existingDescriptions.has(r.description.toLowerCase().trim())
+  );
+
+  if (notYetAdded.length === 0) { alerts.classList.add('hidden'); return; }
+
   alerts.classList.remove('hidden');
-  alerts.innerHTML = upcoming.map(r => {
+  alerts.innerHTML = notYetAdded.map(r => {
     const diff = r.day_of_month - todayDay;
     const badge = diff === 0 ? 'Oggi!' : `in ${diff}g`;
     return `

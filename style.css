@@ -229,7 +229,7 @@ body {
 .balance-section { text-align: center; }
 
 .balance-scale {
-  margin: 0 auto 0.75rem;
+  margin: 0 auto 1.75rem;
   max-width: 320px;
 }
 
@@ -308,11 +308,6 @@ body {
 }
 .btn-settle:hover { background: rgba(255,255,255,0.35); transform: scale(1.04); }
 .btn-settle:active { transform: scale(0.97); }
-
-/* Scale tilt animations */
-.scale-beam.tilt-left  { transform: rotate(-8deg); }
-.scale-beam.tilt-right { transform: rotate(8deg); }
-.scale-beam.balanced   { transform: rotate(0deg); }
 
 /* ============================================
    BOTTOM NAV

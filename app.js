@@ -816,8 +816,9 @@ async function renderHome(allowConfetti = false) {
     });
   }
 
-  // Balance uses ALL expenses (carryover from prior months + current month)
-  updateBalance([...prevExpenses, ...curExpenses], curExpenses.length, allowConfetti);
+  // Net owed uses ALL expenses (carryover from prior months + current month);
+  // the per-person figures shown on the scale use only the current month
+  updateBalance([...prevExpenses, ...curExpenses], curExpenses, allowConfetti);
 }
 
 function updateMonthLabel() {
@@ -871,9 +872,11 @@ async function settleUp() {
   await renderHome(true);
 }
 
+const SCALE_MAX_ANGLE = 22; // degrees reached only when one person paid everything and the other nothing
+
 // allExpenses: all expenses used for net calculation (prior months + current month)
-// currentMonthCount: number of expenses in the currently viewed month (for confetti gate)
-function updateBalance(allExpenses, currentMonthCount = 0, allowConfetti = false) {
+// curExpenses: expenses in the currently viewed month (for the "spent this month" figures + confetti gate)
+function updateBalance(allExpenses, curExpenses = [], allowConfetti = false) {
   let net = 0; // positive → Sara owes Marco, negative → Marco owes Sara
   allExpenses.forEach(e => {
     const amt = parseFloat(e.amount);
@@ -884,17 +887,35 @@ function updateBalance(allExpenses, currentMonthCount = 0, allowConfetti = false
     }
   });
 
+  // Amount each person actually paid/anticipated in the current month
+  let spentMarco = 0, spentSara = 0;
+  curExpenses.forEach(e => {
+    const amt = parseFloat(e.amount);
+    if (e.paid_by === PERSON_A) spentMarco += amt;
+    else                        spentSara  += amt;
+  });
+
   const absNet = Math.abs(net);
   const balanceText = document.getElementById('balance-text');
   const beam = document.getElementById('scale-beam');
+  const marcoPerson = document.getElementById('scale-marco');
+  const saraPerson  = document.getElementById('scale-sara');
   const marcoCredit = document.getElementById('marco-credit');
   const saraCredit  = document.getElementById('sara-credit');
   const settleBtn = document.getElementById('btn-settle');
   settleBtn.dataset.net = net.toFixed(4);
   settleBtn.classList.toggle('hidden', absNet < 0.01); // show if any cumulative balance
 
-  marcoCredit.textContent = `€${absNet > 0 && net > 0 ? absNet.toFixed(2) : '0.00'}`;
-  saraCredit.textContent  = `€${absNet > 0 && net < 0 ? absNet.toFixed(2) : '0.00'}`;
+  marcoCredit.textContent = `€${spentMarco.toFixed(2)}`;
+  saraCredit.textContent  = `€${spentSara.toFixed(2)}`;
+
+  // Tilt proportionally to how spending is split between the two this month.
+  // The person blocks counter-rotate so their name/amount stay upright, like a real seesaw plank.
+  const totalSpent = spentMarco + spentSara;
+  const tiltAngle = totalSpent < 0.01 ? 0 : -SCALE_MAX_ANGLE * (spentMarco - spentSara) / totalSpent;
+  beam.style.transform = `rotate(${tiltAngle}deg)`;
+  marcoPerson.style.transform = `rotate(${-tiltAngle}deg)`;
+  saraPerson.style.transform  = `rotate(${-tiltAngle}deg)`;
 
   const reactions = absNet < 0.01
     ? REACTIONS.zero
@@ -903,14 +924,11 @@ function updateBalance(allExpenses, currentMonthCount = 0, allowConfetti = false
 
   if (absNet < 0.01) {
     balanceText.textContent = reaction;
-    beam.className = 'scale-beam balanced';
-    if (allowConfetti && currentMonthCount > 0) showConfetti();
+    if (allowConfetti && curExpenses.length > 0) showConfetti();
   } else if (net > 0) {
     balanceText.textContent = `${LABEL_B} deve a ${LABEL_A} €${absNet.toFixed(2)} — ${reaction}`;
-    beam.className = 'scale-beam tilt-left';
   } else {
     balanceText.textContent = `${LABEL_A} deve a ${LABEL_B} €${absNet.toFixed(2)} — ${reaction}`;
-    beam.className = 'scale-beam tilt-right';
   }
 }
 

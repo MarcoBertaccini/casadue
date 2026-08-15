@@ -145,11 +145,12 @@
                 <div class="category-grid" id="category-grid"></div>
               </div>
               <div class="form-group">
-                <label>Split</label>
+                <label>Divisione della spesa</label>
+                <p class="split-help">Quota a carico di ciascuno · chi ha pagato anticipa il totale</p>
                 <div class="split-slider-wrap">
-                  <span>Marco</span>
-                  <input type="range" id="f-split" min="0" max="100" value="70" />
                   <span>Sara</span>
+                  <input type="range" id="f-split" min="0" max="100" value="70" />
+                  <span>Marco</span>
                 </div>
                 <div class="split-rows">
                   <div class="split-row">
@@ -169,6 +170,7 @@
                     <input type="number" id="f-eur-b" class="split-eur" placeholder="—" step="0.01" />
                   </div>
                 </div>
+                <p class="split-outcome" id="f-split-outcome"></p>
               </div>
               <button type="submit" class="btn-primary">Salva spesa 💾</button>
             </form>
@@ -244,11 +246,12 @@
           <div class="category-grid" id="rf-category-grid"></div>
         </div>
         <div class="form-group">
-          <label>Split</label>
+          <label>Divisione della spesa</label>
+          <p class="split-help">Quota a carico di ciascuno · chi paga anticipa il totale</p>
           <div class="split-slider-wrap">
-            <span>Marco</span>
-            <input type="range" id="rf-split" min="0" max="100" value="70" />
             <span>Sara</span>
+            <input type="range" id="rf-split" min="0" max="100" value="70" />
+            <span>Marco</span>
           </div>
           <div class="split-rows">
             <div class="split-row">
@@ -268,6 +271,7 @@
               <input type="number" id="rf-eur-b" class="split-eur" placeholder="—" step="0.01" />
             </div>
           </div>
+          <p class="split-outcome" id="rf-split-outcome"></p>
         </div>
         <div class="modal-actions">
           <button type="button" class="btn-secondary" id="btn-cancel-recurring">Annulla</button>

@@ -213,7 +213,7 @@ function setCategoryInGrid(containerId, catId) {
 // Given slider/pct-a/eur-a/eur-b IDs and the total-amount input ID,
 // wires up full bidirectional sync: slider ↔ pct ↔ €
 function initSplitSync(ids) {
-  const { slider, pctA, pctB, eurA, eurB, totalId } = ids;
+  const { slider, pctA, pctB, eurA, eurB, totalId, onChange } = ids;
 
   const getTotal = () => parseFloat(document.getElementById(totalId)?.value) || 0;
 
@@ -228,6 +228,7 @@ function initSplitSync(ids) {
       if (source !== 'eurA') document.getElementById(eurA).value = (total * pA / 100).toFixed(2);
       if (source !== 'eurB') document.getElementById(eurB).value = (total * pB / 100).toFixed(2);
     }
+    if (typeof onChange === 'function') onChange();
   }
 
   // Slider moved
@@ -276,6 +277,45 @@ function initSplitSync(ids) {
 }
 
 // ============================================
+//  SPLIT OUTCOME — plain-language "who owes whom"
+// ============================================
+// Semantics: the split % is each person's share of the cost. Whoever
+// paid fronts the whole amount, so the OTHER person owes their own share.
+function splitOutcomeText(payer, total, pctMarco, pctSara) {
+  if (!total || total <= 0) return '';
+  const shareMarco = total * pctMarco / 100;
+  const shareSara  = total * pctSara  / 100;
+  if (payer === PERSON_A) { // Marco paid → Sara owes Marco her share
+    return shareSara < 0.005
+      ? `Spesa tutta di ${LABEL_A} · nessuno deve niente`
+      : `${LABEL_B} deve a ${LABEL_A} €${shareSara.toFixed(2)}`;
+  }
+  return shareMarco < 0.005 // Sara paid → Marco owes Sara his share
+    ? `Spesa tutta di ${LABEL_B} · nessuno deve niente`
+    : `${LABEL_A} deve a ${LABEL_B} €${shareMarco.toFixed(2)}`;
+}
+
+function updateExpenseOutcome() {
+  const el = document.getElementById('f-split-outcome');
+  if (!el) return;
+  el.textContent = splitOutcomeText(
+    selectedPayer,
+    parseFloat(document.getElementById('f-amount').value) || 0,
+    parseInt(document.getElementById('f-pct-a').value) || 0,
+    parseInt(document.getElementById('f-pct-b').value) || 0);
+}
+
+function updateRecurringOutcome() {
+  const el = document.getElementById('rf-split-outcome');
+  if (!el) return;
+  el.textContent = splitOutcomeText(
+    rfSelectedPayer,
+    parseFloat(document.getElementById('rf-amount').value) || 0,
+    parseInt(document.getElementById('rf-pct-a').value) || 0,
+    parseInt(document.getElementById('rf-pct-b').value) || 0);
+}
+
+// ============================================
 //  FORM HELPERS
 // ============================================
 function resetExpenseForm() {
@@ -291,6 +331,7 @@ function resetExpenseForm() {
   document.querySelectorAll('#expense-form .payer-btn').forEach((b, i) => b.classList.toggle('active', i === 0));
   setCategoryInGrid('category-grid', 'altro');
   document.getElementById('category-preview').innerHTML = '';
+  updateExpenseOutcome();
 }
 
 function setAddPageMode(isEdit) {
@@ -320,6 +361,7 @@ function openEditExpense(expense) {
   selectedCategory = expense.category;
   setCategoryInGrid('category-grid', expense.category);
   document.getElementById('category-preview').innerHTML = '';
+  updateExpenseOutcome();
 
   setAddPageMode(true);
 
@@ -352,6 +394,7 @@ function openEditRecurring(r) {
   setCategoryInGrid('rf-category-grid', r.category);
 
   document.querySelector('#recurring-modal h3').textContent = 'Modifica spesa fissa';
+  updateRecurringOutcome();
   document.getElementById('recurring-modal').classList.remove('hidden');
 }
 
@@ -365,6 +408,7 @@ function initFormListeners() {
       document.querySelectorAll('#expense-form .payer-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       selectedPayer = btn.dataset.payer;
+      updateExpenseOutcome();
     });
   });
 
@@ -374,14 +418,15 @@ function initFormListeners() {
       document.querySelectorAll('#recurring-form .payer-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       rfSelectedPayer = btn.dataset.payer;
+      updateRecurringOutcome();
     });
   });
 
   // Split sync — expense form
-  initSplitSync({ slider: 'f-split', pctA: 'f-pct-a', pctB: 'f-pct-b', eurA: 'f-eur-a', eurB: 'f-eur-b', totalId: 'f-amount' });
+  initSplitSync({ slider: 'f-split', pctA: 'f-pct-a', pctB: 'f-pct-b', eurA: 'f-eur-a', eurB: 'f-eur-b', totalId: 'f-amount', onChange: updateExpenseOutcome });
 
   // Split sync — recurring form
-  initSplitSync({ slider: 'rf-split', pctA: 'rf-pct-a', pctB: 'rf-pct-b', eurA: 'rf-eur-a', eurB: 'rf-eur-b', totalId: 'rf-amount' });
+  initSplitSync({ slider: 'rf-split', pctA: 'rf-pct-a', pctB: 'rf-pct-b', eurA: 'rf-eur-a', eurB: 'rf-eur-b', totalId: 'rf-amount', onChange: updateRecurringOutcome });
 
   // Auto-detect category from description
   const descInput = document.getElementById('f-desc');
@@ -454,6 +499,7 @@ function initFormListeners() {
   document.getElementById('btn-add-recurring').addEventListener('click', () => {
     editingRecurringId = null;
     document.querySelector('#recurring-modal h3').textContent = 'Spesa fissa';
+    updateRecurringOutcome();
     document.getElementById('recurring-modal').classList.remove('hidden');
   });
   document.getElementById('btn-cancel-recurring').addEventListener('click', () => {

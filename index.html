@@ -8,13 +8,13 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <meta name="theme-color" content="#f7a8c4" />
+  <meta name="theme-color" content="#43719C" />
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=20260705a" />
+  <link rel="stylesheet" href="style.css?v=20260815c" />
 </head>
 <body>
   <div id="app">
@@ -41,14 +41,8 @@
         <div class="header-top">
           <span class="app-name">CasaDue</span>
           <div class="header-actions">
-            <button class="btn-icon" id="btn-season-toggle" title="Tema stagionale">🌸</button>
-            <button class="btn-icon" id="btn-logout" title="Esci">🔒</button>
+            <button class="btn-icon" id="btn-logout" title="Esci" aria-label="Esci">🔒</button>
           </div>
-        </div>
-
-        <!-- Holiday banner -->
-        <div id="holiday-banner" class="holiday-banner hidden">
-          <span id="holiday-text"></span>
         </div>
 
         <!-- Balance Scale -->
@@ -106,9 +100,9 @@
 
             <!-- Month filter -->
             <div class="month-filter">
-              <button class="month-nav" id="prev-month">‹</button>
+              <button class="month-nav" id="prev-month" aria-label="Mese precedente">‹</button>
               <span class="month-label" id="month-label">Giugno 2026</span>
-              <button class="month-nav" id="next-month">›</button>
+              <button class="month-nav" id="next-month" aria-label="Mese successivo">›</button>
             </div>
 
             <!-- Expenses list -->
@@ -151,11 +145,12 @@
                 <div class="category-grid" id="category-grid"></div>
               </div>
               <div class="form-group">
-                <label>Split</label>
+                <label>Divisione della spesa</label>
+                <p class="split-help">Quota a carico di ciascuno · chi ha pagato anticipa il totale</p>
                 <div class="split-slider-wrap">
-                  <span>Marco</span>
-                  <input type="range" id="f-split" min="0" max="100" value="70" />
                   <span>Sara</span>
+                  <input type="range" id="f-split" min="0" max="100" value="70" />
+                  <span>Marco</span>
                 </div>
                 <div class="split-rows">
                   <div class="split-row">
@@ -175,6 +170,7 @@
                     <input type="number" id="f-eur-b" class="split-eur" placeholder="—" step="0.01" />
                   </div>
                 </div>
+                <p class="split-outcome" id="f-split-outcome"></p>
               </div>
               <button type="submit" class="btn-primary">Salva spesa 💾</button>
             </form>
@@ -195,9 +191,9 @@
           <div class="page-inner">
             <h2 class="page-title">Statistiche</h2>
             <div class="stats-month-selector">
-              <button class="month-nav" id="stats-prev-month">‹</button>
+              <button class="month-nav" id="stats-prev-month" aria-label="Mese precedente">‹</button>
               <span class="month-label" id="stats-month-label">Giugno 2026</span>
-              <button class="month-nav" id="stats-next-month">›</button>
+              <button class="month-nav" id="stats-next-month" aria-label="Mese successivo">›</button>
             </div>
             <div id="stats-content" class="stats-content"></div>
           </div>
@@ -250,11 +246,12 @@
           <div class="category-grid" id="rf-category-grid"></div>
         </div>
         <div class="form-group">
-          <label>Split</label>
+          <label>Divisione della spesa</label>
+          <p class="split-help">Quota a carico di ciascuno · chi paga anticipa il totale</p>
           <div class="split-slider-wrap">
-            <span>Marco</span>
-            <input type="range" id="rf-split" min="0" max="100" value="70" />
             <span>Sara</span>
+            <input type="range" id="rf-split" min="0" max="100" value="70" />
+            <span>Marco</span>
           </div>
           <div class="split-rows">
             <div class="split-row">
@@ -274,6 +271,7 @@
               <input type="number" id="rf-eur-b" class="split-eur" placeholder="—" step="0.01" />
             </div>
           </div>
+          <p class="split-outcome" id="rf-split-outcome"></p>
         </div>
         <div class="modal-actions">
           <button type="button" class="btn-secondary" id="btn-cancel-recurring">Annulla</button>
@@ -284,6 +282,6 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-  <script src="app.js?v=202607052335"></script>
+  <script src="app.js?v=20260815c"></script>
 </body>
 </html>

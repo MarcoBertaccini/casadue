@@ -1,76 +1,19 @@
 /* ============================================
-   CASADUE — Palette stagionale + Nunito/Playfair
+   CASADUE — Tema unico (Inverno) + Nunito/Playfair
    ============================================ */
 
-/* --- Stagione: Primavera (default Mar-May) --- */
+/* --- Tema unico (Inverno) --- */
 :root {
-  --c-primary:    #E8629A;
-  --c-primary-lt: #F9C4DB;
-  --c-accent:     #6BBF8E;
-  --c-accent-lt:  #C2E8D2;
-  --c-bg:         #FFF5F9;
+  --c-primary:    #43719C;
+  --c-primary-lt: #C4D6E8;
+  --c-accent:     #6F6BA0;
+  --c-accent-lt:  #D3CFE6;
+  --c-bg:         #F4F6FA;
   --c-card:       #FFFFFF;
-  --c-text:       #3D2B3D;
-  --c-text-soft:  #8C6B8C;
-  --c-border:     #F0D0E0;
+  --c-text:       #17212F;
+  --c-text-soft:  #5A6A7C;
+  --c-border:     #D2DEEC;
   --c-nav:        #FFFFFF;
-  --season-emoji: "🌸";
-  --season-name:  "Primavera";
-}
-
-/* Estate (Giu-Ago) */
-body.summer {
-  --c-primary:    #F4844B;
-  --c-primary-lt: #FFD4BA;
-  --c-accent:     #4BADE0;
-  --c-accent-lt:  #C0E4F8;
-  --c-bg:         #FFFDF0;
-  --c-card:       #FFFFFF;
-  --c-text:       #2C3E50;
-  --c-text-soft:  #7A8C9A;
-  --c-border:     #FFE4C4;
-  --c-nav:        #FFFFFF;
-}
-
-/* Autunno (Set-Nov) */
-body.autumn {
-  --c-primary:    #C0623A;
-  --c-primary-lt: #F0C4A8;
-  --c-accent:     #8B6B4A;
-  --c-accent-lt:  #E0D0BC;
-  --c-bg:         #FDF6EC;
-  --c-card:       #FFFFFF;
-  --c-text:       #2D1B0E;
-  --c-text-soft:  #8C6A44;
-  --c-border:     #F0D8C0;
-  --c-nav:        #FFFFFF;
-}
-
-/* Inverno (Dic-Feb) */
-body.winter {
-  --c-primary:    #5B8FBF;
-  --c-primary-lt: #BACFE8;
-  --c-accent:     #9B84BE;
-  --c-accent-lt:  #DDD4F0;
-  --c-bg:         #F5F7FA;
-  --c-card:       #FFFFFF;
-  --c-text:       #1A2332;
-  --c-text-soft:  #6A7A8C;
-  --c-border:     #D8E4F0;
-  --c-nav:        #FFFFFF;
-}
-
-/* Force-override se stagione disattivata dall'utente */
-body.no-season {
-  --c-primary:    #E8629A;
-  --c-primary-lt: #F9C4DB;
-  --c-accent:     #6BBF8E;
-  --c-accent-lt:  #C2E8D2;
-  --c-bg:         #FFF5F9;
-  --c-card:       #FFFFFF;
-  --c-text:       #3D2B3D;
-  --c-text-soft:  #8C6B8C;
-  --c-border:     #F0D0E0;
 }
 
 /* ============================================
@@ -82,6 +25,7 @@ html { font-size: 16px; -webkit-text-size-adjust: 100%; }
 
 body {
   font-family: 'Nunito', sans-serif;
+  line-height: 1.4;
   background: var(--c-bg);
   color: var(--c-text);
   min-height: 100dvh;
@@ -126,10 +70,12 @@ body {
 }
 
 .app-title {
-  font-size: 2.5rem;
-  font-weight: 900;
+  font-size: 2.25rem;
+  font-weight: 800;
   color: var(--c-primary);
-  letter-spacing: -1px;
+  letter-spacing: -0.5px;
+  line-height: 1.05;
+  text-wrap: balance;
 }
 
 .pin-subtitle {
@@ -198,9 +144,9 @@ body {
 }
 
 .app-name {
-  font-size: 1.3rem;
-  font-weight: 900;
-  letter-spacing: -0.5px;
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.3px;
 }
 
 .header-actions {
@@ -262,7 +208,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 900;
+  font-weight: 800;
   font-size: 1rem;
 }
 
@@ -276,6 +222,7 @@ body {
   font-family: 'Playfair Display', serif;
   font-size: 1.1rem;
   font-weight: 700;
+  font-variant-numeric: tabular-nums;
 }
 
 .scale-pivot {
@@ -359,7 +306,7 @@ body {
   align-items: center;
   justify-content: center;
   font-size: 1.4rem;
-  font-weight: 900;
+  font-weight: 800;
   line-height: 1;
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
   margin-bottom: 0.1rem;
@@ -382,9 +329,12 @@ body {
 }
 
 .page-title {
-  font-size: 1.4rem;
-  font-weight: 900;
+  font-size: 1.5rem;
+  font-weight: 800;
   color: var(--c-text);
+  letter-spacing: -0.3px;
+  line-height: 1.15;
+  text-wrap: balance;
   margin-bottom: 1.25rem;
 }
 
@@ -404,7 +354,7 @@ body {
   background: var(--c-card);
   color: var(--c-text-soft);
   font-size: 1rem;
-  font-weight: 900;
+  font-weight: 800;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -452,12 +402,13 @@ body {
   width: 2.5rem;
   height: 2.5rem;
   font-size: 1.2rem;
-  font-weight: 900;
+  font-weight: 700;
   cursor: pointer;
   color: var(--c-primary);
   transition: background 0.2s, border-color 0.2s;
 }
 .month-nav:hover { background: var(--c-primary-lt); border-color: var(--c-primary); }
+.month-nav:focus-visible { border-color: var(--c-primary); box-shadow: 0 0 0 3px var(--c-primary-lt); outline: none; }
 
 .month-label {
   font-weight: 800;
@@ -465,6 +416,7 @@ body {
   color: var(--c-text);
   min-width: 140px;
   text-align: center;
+  font-variant-numeric: tabular-nums;
 }
 
 /* ============================================
@@ -543,7 +495,7 @@ body {
 
 .expense-desc {
   font-weight: 700;
-  font-size: 0.95rem;
+  font-size: 1rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -563,12 +515,7 @@ body {
   font-size: 1.05rem;
   font-weight: 700;
   color: var(--c-primary);
-}
-
-.expense-payer {
-  font-size: 0.7rem;
-  color: var(--c-text-soft);
-  font-weight: 700;
+  font-variant-numeric: tabular-nums;
 }
 
 .expense-card .edit-btn,
@@ -605,6 +552,7 @@ body {
 .carryover-amount {
   font-weight: 800;
   color: var(--c-primary);
+  font-variant-numeric: tabular-nums;
 }
 
 .empty-state {
@@ -614,6 +562,11 @@ body {
 }
 .empty-state .empty-icon { font-size: 3rem; margin-bottom: 0.75rem; }
 .empty-state p { font-weight: 700; }
+.empty-state .empty-cta {
+  width: auto;
+  margin: 1.25rem auto 0;
+  padding: 0.7rem 1.4rem;
+}
 
 /* ============================================
    FORM
@@ -631,8 +584,8 @@ body {
 }
 
 .form-group label {
-  font-weight: 800;
-  font-size: 0.85rem;
+  font-weight: 700;
+  font-size: 0.78rem;
   color: var(--c-text-soft);
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -651,6 +604,7 @@ body {
   color: var(--c-text);
   transition: border-color 0.2s, box-shadow 0.2s;
   outline: none;
+  font-variant-numeric: tabular-nums;
 }
 
 .form-group input:focus {
@@ -751,6 +705,29 @@ body {
   gap: 0.4rem;
 }
 
+/* Helper caption under the split label */
+.split-help {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--c-text-soft);
+  margin: -0.15rem 0 0.5rem;
+}
+
+/* Live plain-language "who owes whom" preview */
+.split-outcome {
+  margin-top: 0.6rem;
+  padding: 0.55rem 0.8rem;
+  background: var(--c-primary-lt);
+  color: var(--c-primary);
+  border-radius: 0.75rem;
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.split-outcome::before { content: "→ "; opacity: 0.7; }
+.split-outcome:empty { display: none; }
+
 .split-row {
   display: flex;
   align-items: center;
@@ -780,11 +757,12 @@ body {
   color: var(--c-text);
   text-align: center;
   outline: none;
+  font-variant-numeric: tabular-nums;
   -moz-appearance: textfield;
 }
 .split-pct::-webkit-inner-spin-button,
 .split-pct::-webkit-outer-spin-button { -webkit-appearance: none; }
-.split-pct:focus { border-color: var(--c-primary); }
+.split-pct:focus { border-color: var(--c-primary); box-shadow: 0 0 0 3px var(--c-primary-lt); outline: none; }
 
 .split-unit {
   font-size: 0.8rem;
@@ -812,11 +790,12 @@ body {
   background: var(--c-card);
   color: var(--c-text);
   outline: none;
+  font-variant-numeric: tabular-nums;
   -moz-appearance: textfield;
 }
 .split-eur::-webkit-inner-spin-button,
 .split-eur::-webkit-outer-spin-button { -webkit-appearance: none; }
-.split-eur:focus { border-color: var(--c-primary); }
+.split-eur:focus { border-color: var(--c-primary); box-shadow: 0 0 0 3px var(--c-primary-lt); outline: none; }
 
 /* Buttons */
 .btn-primary {
@@ -875,7 +854,7 @@ body {
 .recurring-card.inactive { opacity: 0.5; }
 
 .recurring-info { flex: 1; }
-.recurring-title { font-weight: 800; font-size: 0.95rem; }
+.recurring-title { font-weight: 700; font-size: 1rem; }
 .recurring-meta { font-size: 0.75rem; color: var(--c-text-soft); font-weight: 600; margin-top: 0.15rem; }
 
 .recurring-actions { display: flex; gap: 0.35rem; }
@@ -916,8 +895,8 @@ body {
 }
 
 .stat-card h3 {
-  font-size: 0.8rem;
-  font-weight: 800;
+  font-size: 0.78rem;
+  font-weight: 700;
   color: var(--c-text-soft);
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -959,7 +938,7 @@ body {
   height: 100%;
   background: linear-gradient(90deg, var(--c-primary), var(--c-accent));
   border-radius: 0.5rem;
-  transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: fade-in 0.35s ease-out;
   display: flex;
   align-items: center;
   padding-right: 0.4rem;
@@ -971,6 +950,7 @@ body {
   font-weight: 800;
   color: white;
   white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 
 /* Donut chart */
@@ -1015,6 +995,7 @@ body {
   margin-bottom: 0.25rem;
   display: flex;
   justify-content: space-between;
+  font-variant-numeric: tabular-nums;
 }
 .comparison-track {
   background: var(--c-bg);
@@ -1025,7 +1006,7 @@ body {
 .comparison-fill {
   height: 100%;
   border-radius: 0.5rem;
-  transition: width 0.8s ease;
+  animation: fade-in 0.35s ease-out;
 }
 
 /* Top category highlight */
@@ -1034,13 +1015,14 @@ body {
   border-radius: 1.25rem;
   padding: 1rem;
   border: 1.5px solid var(--c-primary-lt);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
   display: flex;
   align-items: center;
   gap: 0.75rem;
 }
 .top-cat-icon { font-size: 2.5rem; }
-.top-cat-text h4 { font-size: 0.75rem; text-transform: uppercase; color: var(--c-text-soft); font-weight: 800; }
-.top-cat-text p { font-size: 1rem; font-weight: 900; color: var(--c-text); margin-top: 0.2rem; }
+.top-cat-text h4 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--c-text-soft); font-weight: 700; }
+.top-cat-text p { font-size: 1.05rem; font-weight: 800; color: var(--c-text); margin-top: 0.2rem; font-variant-numeric: tabular-nums; }
 
 /* Monthly postcard */
 .postcard-btn {
@@ -1096,7 +1078,7 @@ body {
 .receipt-header {
   font-size: 0.85rem;
   font-weight: 800;
-  color: #999;
+  color: #6B6B6B;
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 1rem;
@@ -1126,6 +1108,7 @@ body {
   font-weight: 700;
   color: var(--c-primary);
   margin-bottom: 1rem;
+  font-variant-numeric: tabular-nums;
 }
 
 .receipt-footer {
@@ -1167,7 +1150,7 @@ body {
 .modal-content {
   background: var(--c-card);
   border-radius: 2rem 2rem 0 0;
-  padding: 1.5rem 1.25rem 2rem;
+  padding: 1.5rem 1.25rem calc(2rem + env(safe-area-inset-bottom));
   width: 100%;
   max-width: 480px;
   max-height: 90dvh;
@@ -1181,8 +1164,9 @@ body {
 }
 
 .modal-content h3 {
-  font-size: 1.3rem;
-  font-weight: 900;
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.3px;
   margin-bottom: 1.25rem;
 }
 
@@ -1243,144 +1227,23 @@ body {
 }
 
 /* ============================================
-   HOLIDAY BANNER
-   ============================================ */
-.holiday-banner {
-  text-align: center;
-  font-size: 0.85rem;
-  font-weight: 800;
-  padding: 0.35rem 1rem;
-  margin: -0.25rem 0 0.6rem;
-  border-radius: 2rem;
-  background: rgba(255,255,255,0.25);
-  color: white;
-  letter-spacing: 0.3px;
-  animation: banner-pulse 3s ease-in-out infinite;
-}
-.holiday-banner.hidden { display: none !important; }
-
-@keyframes banner-pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.85; transform: scale(1.01); }
-}
-
-/* ---- Festività: palette overrides (dopo le stagioni per vincere in specificità) ---- */
-
-/* 🎄 Natale: 20-26 dic */
-body.holiday-natale {
-  --c-primary:    #C0392B;
-  --c-primary-lt: #FADBD8;
-  --c-accent:     #1E8449;
-  --c-accent-lt:  #A9DFBF;
-  --c-bg:         #FFF8F0;
-  --c-text:       #1A1A1A;
-  --c-text-soft:  #7D6608;
-  --c-border:     #F5CBA7;
-  --c-nav:        #FFFFFF;
-}
-
-/* 🎆 Capodanno: 27 dic - 2 gen */
-body.holiday-capodanno {
-  --c-primary:    #9B59B6;
-  --c-primary-lt: #E8DAEF;
-  --c-accent:     #D4AC0D;
-  --c-accent-lt:  #FCF3CF;
-  --c-bg:         #0D0D1A;
-  --c-card:       #1A1A2E;
-  --c-text:       #EAEAEA;
-  --c-text-soft:  #B0A0D0;
-  --c-border:     #2A2A4A;
-  --c-nav:        #1A1A2E;
-}
-
-/* ⭐ Epifania: 6 gen */
-body.holiday-epifania {
-  --c-primary:    #1A5276;
-  --c-primary-lt: #AED6F1;
-  --c-accent:     #D4AC0D;
-  --c-accent-lt:  #FCF3CF;
-  --c-bg:         #EBF5FB;
-  --c-text:       #1A2332;
-  --c-text-soft:  #5D6D7E;
-  --c-border:     #AED6F1;
-}
-
-/* ❤️ San Valentino: 14 feb */
-body.holiday-sanvalentino {
-  --c-primary:    #C0392B;
-  --c-primary-lt: #FADADD;
-  --c-accent:     #E91E8C;
-  --c-accent-lt:  #FBCFE8;
-  --c-bg:         #FFF0F3;
-  --c-text:       #2C0A0A;
-  --c-text-soft:  #A04060;
-  --c-border:     #F5B8C4;
-}
-
-/* 🐣 Pasqua: data variabile */
-body.holiday-pasqua {
-  --c-primary:    #7D3C98;
-  --c-primary-lt: #E8DAEF;
-  --c-accent:     #28B463;
-  --c-accent-lt:  #A9DFBF;
-  --c-bg:         #FDFEFE;
-  --c-text:       #1C1C2E;
-  --c-text-soft:  #6C4A8A;
-  --c-border:     #D7BDE2;
-}
-
-/* 🏖️ Ferragosto: 14-16 ago */
-body.holiday-ferragosto {
-  --c-primary:    #1565C0;
-  --c-primary-lt: #BBDEFB;
-  --c-accent:     #F9A825;
-  --c-accent-lt:  #FFF9C4;
-  --c-bg:         #E3F2FD;
-  --c-text:       #0D1B2A;
-  --c-text-soft:  #455A64;
-  --c-border:     #90CAF9;
-}
-
-/* 🎃 Halloween: 28-31 ott */
-body.holiday-halloween {
-  --c-primary:    #E65100;
-  --c-primary-lt: #FFE0B2;
-  --c-accent:     #6A1B9A;
-  --c-accent-lt:  #E1BEE7;
-  --c-bg:         #1A0A00;
-  --c-card:       #2C1400;
-  --c-text:       #FFD180;
-  --c-text-soft:  #CE93D8;
-  --c-border:     #4A2000;
-  --c-nav:        #2C1400;
-}
-
-/* ============================================
-   FLOATING HOLIDAY DECORATIONS (CSS only)
-   ============================================ */
-.holiday-deco {
-  position: fixed;
-  pointer-events: none;
-  z-index: 5;
-  font-size: 1.2rem;
-  animation: float-deco linear infinite;
-  opacity: 0.6;
-  user-select: none;
-}
-
-@keyframes float-deco {
-  0%   { transform: translateY(-20px) rotate(0deg); opacity: 0; }
-  10%  { opacity: 0.6; }
-  90%  { opacity: 0.6; }
-  100% { transform: translateY(100dvh) rotate(360deg); opacity: 0; }
-}
-
-/* ============================================
    SCROLLBAR
    ============================================ */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--c-border); border-radius: 3px; }
+
+/* ============================================
+   REDUCED MOTION
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
 
 /* ============================================
    RESPONSIVE desktop centering

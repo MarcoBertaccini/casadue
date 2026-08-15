@@ -1,76 +1,19 @@
 /* ============================================
-   CASADUE — Palette stagionale + Nunito/Playfair
+   CASADUE — Tema unico (Inverno) + Nunito/Playfair
    ============================================ */
 
-/* --- Stagione: Primavera (default Mar-May) --- */
+/* --- Tema unico (Inverno) --- */
 :root {
-  --c-primary:    #D23F6C;
-  --c-primary-lt: #F6D2DE;
-  --c-accent:     #2A9D8F;
-  --c-accent-lt:  #C3E5DE;
-  --c-bg:         #FBF7F9;
+  --c-primary:    #43719C;
+  --c-primary-lt: #C4D6E8;
+  --c-accent:     #6F6BA0;
+  --c-accent-lt:  #D3CFE6;
+  --c-bg:         #F4F6FA;
   --c-card:       #FFFFFF;
-  --c-text:       #2C2733;
-  --c-text-soft:  #6E6675;
-  --c-border:     #EBDCE3;
+  --c-text:       #17212F;
+  --c-text-soft:  #5A6A7C;
+  --c-border:     #D2DEEC;
   --c-nav:        #FFFFFF;
-  --season-emoji: "🌸";
-  --season-name:  "Primavera";
-}
-
-/* Estate (Giu-Ago) */
-body.summer {
-  --c-primary:    #F4844B;
-  --c-primary-lt: #FFD4BA;
-  --c-accent:     #4BADE0;
-  --c-accent-lt:  #C0E4F8;
-  --c-bg:         #FFFDF0;
-  --c-card:       #FFFFFF;
-  --c-text:       #2C3E50;
-  --c-text-soft:  #7A8C9A;
-  --c-border:     #FFE4C4;
-  --c-nav:        #FFFFFF;
-}
-
-/* Autunno (Set-Nov) */
-body.autumn {
-  --c-primary:    #C0623A;
-  --c-primary-lt: #F0C4A8;
-  --c-accent:     #8B6B4A;
-  --c-accent-lt:  #E0D0BC;
-  --c-bg:         #FDF6EC;
-  --c-card:       #FFFFFF;
-  --c-text:       #2D1B0E;
-  --c-text-soft:  #8C6A44;
-  --c-border:     #F0D8C0;
-  --c-nav:        #FFFFFF;
-}
-
-/* Inverno (Dic-Feb) */
-body.winter {
-  --c-primary:    #5B8FBF;
-  --c-primary-lt: #BACFE8;
-  --c-accent:     #9B84BE;
-  --c-accent-lt:  #DDD4F0;
-  --c-bg:         #F5F7FA;
-  --c-card:       #FFFFFF;
-  --c-text:       #1A2332;
-  --c-text-soft:  #6A7A8C;
-  --c-border:     #D8E4F0;
-  --c-nav:        #FFFFFF;
-}
-
-/* Force-override se stagione disattivata dall'utente */
-body.no-season {
-  --c-primary:    #D23F6C;
-  --c-primary-lt: #F6D2DE;
-  --c-accent:     #2A9D8F;
-  --c-accent-lt:  #C3E5DE;
-  --c-bg:         #FBF7F9;
-  --c-card:       #FFFFFF;
-  --c-text:       #2C2733;
-  --c-text-soft:  #6E6675;
-  --c-border:     #EBDCE3;
 }
 
 /* ============================================
@@ -1254,139 +1197,6 @@ body {
 }
 
 /* ============================================
-   HOLIDAY BANNER
-   ============================================ */
-.holiday-banner {
-  text-align: center;
-  font-size: 0.85rem;
-  font-weight: 800;
-  padding: 0.35rem 1rem;
-  margin: -0.25rem 0 0.6rem;
-  border-radius: 2rem;
-  background: rgba(255,255,255,0.25);
-  color: white;
-  letter-spacing: 0.3px;
-  animation: banner-pulse 3s ease-in-out infinite;
-}
-.holiday-banner.hidden { display: none !important; }
-
-@keyframes banner-pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.85; transform: scale(1.01); }
-}
-
-/* ---- Festività: palette overrides (dopo le stagioni per vincere in specificità) ---- */
-
-/* 🎄 Natale: 20-26 dic */
-body.holiday-natale {
-  --c-primary:    #C0392B;
-  --c-primary-lt: #FADBD8;
-  --c-accent:     #1E8449;
-  --c-accent-lt:  #A9DFBF;
-  --c-bg:         #FFF8F0;
-  --c-text:       #1A1A1A;
-  --c-text-soft:  #7D6608;
-  --c-border:     #F5CBA7;
-  --c-nav:        #FFFFFF;
-}
-
-/* 🎆 Capodanno: 27 dic - 2 gen */
-body.holiday-capodanno {
-  --c-primary:    #9B59B6;
-  --c-primary-lt: #E8DAEF;
-  --c-accent:     #D4AC0D;
-  --c-accent-lt:  #FCF3CF;
-  --c-bg:         #0D0D1A;
-  --c-card:       #1A1A2E;
-  --c-text:       #EAEAEA;
-  --c-text-soft:  #B0A0D0;
-  --c-border:     #2A2A4A;
-  --c-nav:        #1A1A2E;
-}
-
-/* ⭐ Epifania: 6 gen */
-body.holiday-epifania {
-  --c-primary:    #1A5276;
-  --c-primary-lt: #AED6F1;
-  --c-accent:     #D4AC0D;
-  --c-accent-lt:  #FCF3CF;
-  --c-bg:         #EBF5FB;
-  --c-text:       #1A2332;
-  --c-text-soft:  #5D6D7E;
-  --c-border:     #AED6F1;
-}
-
-/* ❤️ San Valentino: 14 feb */
-body.holiday-sanvalentino {
-  --c-primary:    #C0392B;
-  --c-primary-lt: #FADADD;
-  --c-accent:     #E91E8C;
-  --c-accent-lt:  #FBCFE8;
-  --c-bg:         #FFF0F3;
-  --c-text:       #2C0A0A;
-  --c-text-soft:  #A04060;
-  --c-border:     #F5B8C4;
-}
-
-/* 🐣 Pasqua: data variabile */
-body.holiday-pasqua {
-  --c-primary:    #7D3C98;
-  --c-primary-lt: #E8DAEF;
-  --c-accent:     #28B463;
-  --c-accent-lt:  #A9DFBF;
-  --c-bg:         #FDFEFE;
-  --c-text:       #1C1C2E;
-  --c-text-soft:  #6C4A8A;
-  --c-border:     #D7BDE2;
-}
-
-/* 🏖️ Ferragosto: 14-16 ago */
-body.holiday-ferragosto {
-  --c-primary:    #1565C0;
-  --c-primary-lt: #BBDEFB;
-  --c-accent:     #F9A825;
-  --c-accent-lt:  #FFF9C4;
-  --c-bg:         #E3F2FD;
-  --c-text:       #0D1B2A;
-  --c-text-soft:  #455A64;
-  --c-border:     #90CAF9;
-}
-
-/* 🎃 Halloween: 28-31 ott */
-body.holiday-halloween {
-  --c-primary:    #E65100;
-  --c-primary-lt: #FFE0B2;
-  --c-accent:     #6A1B9A;
-  --c-accent-lt:  #E1BEE7;
-  --c-bg:         #1A0A00;
-  --c-card:       #2C1400;
-  --c-text:       #FFD180;
-  --c-text-soft:  #CE93D8;
-  --c-border:     #4A2000;
-  --c-nav:        #2C1400;
-}
-
-/* ============================================
-   FLOATING HOLIDAY DECORATIONS (CSS only)
-   ============================================ */
-.holiday-deco {
-  position: fixed;
-  pointer-events: none;
-  z-index: 5;
-  font-size: 1.2rem;
-  animation: float-deco linear infinite;
-  opacity: 0.6;
-  user-select: none;
-}
-
-@keyframes float-deco {
-  0%   { transform: translateY(-20px) rotate(0deg); opacity: 0; }
-  10%  { opacity: 0.6; }
-  90%  { opacity: 0.6; }
-  100% { transform: translateY(100dvh) rotate(360deg); opacity: 0; }
-}
-
-/* ============================================
    SCROLLBAR
    ============================================ */
 ::-webkit-scrollbar { width: 6px; }
@@ -1403,7 +1213,6 @@ body.holiday-halloween {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-  .holiday-deco { display: none; }
 }
 
 /* ============================================

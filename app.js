@@ -777,7 +777,13 @@ async function renderHome(allowConfetti = false) {
 
   if (curExpenses.length === 0) {
     list.innerHTML = carryoverHtml +
-      `<div class="empty-state"><div class="empty-icon">🧾</div><p>Nessuna spesa questo mese</p></div>`;
+      `<div class="empty-state">
+        <div class="empty-icon">🧾</div>
+        <p>Nessuna spesa questo mese</p>
+        <button type="button" class="btn-primary empty-cta" id="empty-add-btn">Aggiungi la prima spesa</button>
+      </div>`;
+    const emptyBtn = document.getElementById('empty-add-btn');
+    if (emptyBtn) emptyBtn.addEventListener('click', () => document.querySelector('[data-page="add"]').click());
   } else {
     list.innerHTML = carryoverHtml + curExpenses.map(e => {
       const cat = CATEGORIES.find(c => c.id === e.category) || CATEGORIES.at(-1);
@@ -792,10 +798,9 @@ async function renderHome(allowConfetti = false) {
           </div>
           <div class="expense-right">
             <div class="expense-amount">€${parseFloat(e.amount).toFixed(2)}</div>
-            <div class="expense-payer">pag. ${payerLabel}</div>
           </div>
-          <button class="edit-btn" data-id="${e.id}" title="Modifica">✏️</button>
-          <button class="delete-btn" data-id="${e.id}" title="Elimina">🗑</button>
+          <button class="edit-btn" data-id="${e.id}" title="Modifica" aria-label="Modifica spesa">✏️</button>
+          <button class="delete-btn" data-id="${e.id}" title="Elimina" aria-label="Elimina spesa">🗑</button>
         </div>`;
     }).join('');
 

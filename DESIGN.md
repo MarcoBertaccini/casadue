@@ -3,15 +3,15 @@ version: alpha
 name: CasaDue
 description: Shared-expense PWA for two people (Marco & Sara), with a date-driven seasonal theme and a balance-scale metaphor.
 colors:
-  primary: "#E8629A"
-  primary-light: "#F9C4DB"
-  accent: "#6BBF8E"
-  accent-light: "#C2E8D2"
-  background: "#FFF5F9"
+  primary: "#D23F6C"
+  primary-light: "#F6D2DE"
+  accent: "#2A9D8F"
+  accent-light: "#C3E5DE"
+  background: "#FBF7F9"
   card: "#FFFFFF"
-  text: "#3D2B3D"
-  text-soft: "#8C6B8C"
-  border: "#F0D0E0"
+  text: "#2C2733"
+  text-soft: "#6E6675"
+  border: "#EBDCE3"
   nav-surface: "#FFFFFF"
   error: "#E05050"
   success: "#4CAF50"
@@ -45,7 +45,7 @@ The frontmatter holds the default theme (Primavera / spring). The values below a
 | `summer` | #F4844B | #FFD4BA | #4BADE0 | #C0E4F8 | #FFFDF0 | #2C3E50 | #7A8C9A | #FFE4C4 | — |
 | `autumn` | #C0623A | #F0C4A8 | #8B6B4A | #E0D0BC | #FDF6EC | #2D1B0E | #8C6A44 | #F0D8C0 | — |
 | `winter` | #5B8FBF | #BACFE8 | #9B84BE | #DDD4F0 | #F5F7FA | #1A2332 | #6A7A8C | #D8E4F0 | — |
-| `no-season` | #E8629A | #F9C4DB | #6BBF8E | #C2E8D2 | #FFF5F9 | #3D2B3D | #8C6B8C | #F0D0E0 | — |
+| `no-season` | #D23F6C | #F6D2DE | #2A9D8F | #C3E5DE | #FBF7F9 | #2C2733 | #6E6675 | #EBDCE3 | — |
 | `holiday-natale` | #C0392B | #FADBD8 | #1E8449 | #A9DFBF | #FFF8F0 | #1A1A1A | #7D6608 | #F5CBA7 | — |
 | `holiday-capodanno` | #9B59B6 | #E8DAEF | #D4AC0D | #FCF3CF | #0D0D1A | #EAEAEA | #B0A0D0 | #2A2A4A | card/nav #1A1A2E |
 | `holiday-epifania` | #1A5276 | #AED6F1 | #D4AC0D | #FCF3CF | #EBF5FB | #1A2332 | #5D6D7E | #AED6F1 | — |

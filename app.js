@@ -1117,7 +1117,7 @@ async function renderStats() {
   const topCatObj = topCat ? CATEGORIES.find(c => c.id === topCat[0]) || CATEGORIES.at(-1) : null;
 
   // Donut colors
-  const DONUT_COLORS = ['#E8629A','#6BBF8E','#F4844B','#4BADE0','#9B84BE','#F4C842','#5BC0EB','#C0623A','#8B6B4A','#4CAF50','#FF7043','#78909C'];
+  const DONUT_COLORS = ['#D23F6C','#2A9D8F','#F4844B','#4BADE0','#9B84BE','#F4C842','#5BC0EB','#C0623A','#8B6B4A','#4CAF50','#FF7043','#78909C'];
 
   content.innerHTML = `
     <!-- Monthly trend -->
@@ -1338,7 +1338,7 @@ function showConfetti() {
 
   const confettiColors = activeHoliday
     ? activeHoliday.confetti
-    : ['#E8629A','#6BBF8E','#F4844B','#4BADE0','#F4C842'];
+    : ['#D23F6C','#2A9D8F','#F4844B','#4BADE0','#F4C842'];
   const pieces = Array.from({ length: 80 }, () => ({
     x: Math.random() * canvas.width,
     y: -20,

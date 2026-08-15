@@ -4,15 +4,15 @@
 
 /* --- Stagione: Primavera (default Mar-May) --- */
 :root {
-  --c-primary:    #E8629A;
-  --c-primary-lt: #F9C4DB;
-  --c-accent:     #6BBF8E;
-  --c-accent-lt:  #C2E8D2;
-  --c-bg:         #FFF5F9;
+  --c-primary:    #D23F6C;
+  --c-primary-lt: #F6D2DE;
+  --c-accent:     #2A9D8F;
+  --c-accent-lt:  #C3E5DE;
+  --c-bg:         #FBF7F9;
   --c-card:       #FFFFFF;
-  --c-text:       #3D2B3D;
-  --c-text-soft:  #8C6B8C;
-  --c-border:     #F0D0E0;
+  --c-text:       #2C2733;
+  --c-text-soft:  #6E6675;
+  --c-border:     #EBDCE3;
   --c-nav:        #FFFFFF;
   --season-emoji: "🌸";
   --season-name:  "Primavera";
@@ -62,15 +62,15 @@ body.winter {
 
 /* Force-override se stagione disattivata dall'utente */
 body.no-season {
-  --c-primary:    #E8629A;
-  --c-primary-lt: #F9C4DB;
-  --c-accent:     #6BBF8E;
-  --c-accent-lt:  #C2E8D2;
-  --c-bg:         #FFF5F9;
+  --c-primary:    #D23F6C;
+  --c-primary-lt: #F6D2DE;
+  --c-accent:     #2A9D8F;
+  --c-accent-lt:  #C3E5DE;
+  --c-bg:         #FBF7F9;
   --c-card:       #FFFFFF;
-  --c-text:       #3D2B3D;
-  --c-text-soft:  #8C6B8C;
-  --c-border:     #F0D0E0;
+  --c-text:       #2C2733;
+  --c-text-soft:  #6E6675;
+  --c-border:     #EBDCE3;
 }
 
 /* ============================================

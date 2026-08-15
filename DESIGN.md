@@ -36,7 +36,7 @@ The palette exists only as CSS custom properties (`--c-*`) set on `:root`; every
 
 ## Typography
 
-Nunito is the only UI typeface, and weight — not size or family — carries hierarchy: 900 for screen and app titles, 800 for buttons, labels, and toggles, 700 for body-strong and list text, 600 for secondary and input text. Because the interface never drops below 600, treat 700 as the effective base weight and reserve 400 for cases that read as genuinely muted.
+Nunito is the only UI typeface, and hierarchy comes from a restrained weight-and-size ladder rather than from black weights: 800 for page and app titles and for the primary button, 700 for list/body-strong text and for the small uppercase eyebrow labels, 600 for secondary and input text. Weight 900 is intentionally not used — it reads as shouting; treat 700 as the effective base weight and reserve 400 for genuinely muted text. Titles carry slight negative tracking and tight line-height; the four levels (eyebrow ~0.78rem, body/list-title ~1rem, page title ~1.5rem, and the Playfair amount) should stay visibly distinct so no screen looks uniformly bold.
 
 Playfair Display (700) is reserved exclusively for monetary amounts — the balance credits, expense amounts, and the receipt total — where the serif is the app's numeric signature. Do not use it for headings, labels, or any non-monetary text; a money value rendered in Nunito or a heading rendered in Playfair both break the established contract.
 
